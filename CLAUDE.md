@@ -1,0 +1,159 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Commands
+
+```bash
+npm run dev        # Start Vite dev server (frontend only)
+vercel dev         # Start full dev environment (frontend + API routes + env vars)
+npm run build      # Production build (output: dist/)
+npm run lint       # ESLint
+npm run preview    # Preview production build locally
+```
+
+No test suite exists in this codebase.
+
+## In-Progress Migration
+
+**A migration from Supabase to Neon + Clerk + Vercel Blob is planned but not yet started.** See `docs/MIGRATION.md` for the full 8-phase plan. Until that migration is complete, the current stack below describes the live codebase.
+
+---
+
+## Current Architecture (pre-migration)
+
+**Stack:** React 18 + TypeScript + Vite, Supabase (DB + Auth + Storage), TanStack React Query v5, React Router v6, shadcn/ui + Tailwind CSS. Deployed on Vercel.
+
+**Language:** The app is in Hebrew with RTL layout (`lang="he" dir="rtl"` in `index.html`). Error messages and UI text in components are in Hebrew.
+
+### Environment Variables (current)
+
+The Supabase client in `src/integrations/supabase/client.ts` has the URL and anon key hardcoded (auto-generated file — don't edit directly). The `.env` file mirrors these as `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, and `VITE_SUPABASE_PROJECT_ID`.
+
+### Routing (`src/App.tsx`)
+
+```
+/                        → Index.tsx
+/category/:categoryName  → CategoryPage.tsx
+/recipe/:recipeId        → RecipePage.tsx
+/new-recipe              → NewRecipePage.tsx
+*                        → NotFound.tsx
+```
+
+App.tsx wraps everything in `QueryClientProvider`, `HelmetProvider`, `TooltipProvider`, `Toaster`, and `Sonner`.
+
+### Data Layer
+
+No REST API — all data access is direct Supabase queries via the exported `supabase` client from `src/integrations/supabase/client.ts`.
+
+- **`src/api/recipes.ts`** — `createRecipe(values)`: creates a recipe + uploads image to `recipe-images` storage bucket + inserts into all 6 related tables.
+- **`src/api/recipeApi.ts`** — `updateRecipeInDb({ recipeId, values })`: updates recipe + delete-then-reinsert pattern for related tables.
+- **`src/api/search.ts`** — `searchRecipesByName(query)`: `.ilike()` search on the `recipes` table.
+
+### Database Schema (8 tables)
+
+| Table | Purpose |
+|---|---|
+| `recipes` | Core recipe records (name, description, image_url, category_id, recommended) |
+| `categories` | Browsable categories (name, slug, color, icon) |
+| `recipe_ingredients` | Ordered by `sort_order` |
+| `recipe_instructions` | Ordered by `step_number` |
+| `recipe_sauces` | Ordered by `step_number` |
+| `recipe_sauce_ingredients` | Ordered by `sort_order` |
+| `recipe_garnish_ingredients` | Ordered by `sort_order` |
+| `recipe_garnish_instructions` | Ordered by `step_number` |
+
+Types are auto-generated in `src/integrations/supabase/types.ts` — don't edit that file.
+
+### React Query Patterns
+
+Data fetching uses `useQuery` and `useMutation` from `@tanstack/react-query`. Common query keys:
+- `['categories']`
+- `['recipes']`
+- `['recipe', recipeId]`
+- `['recipePicks']` / `['recommendedRecipes']`
+
+Mutations call `queryClient.invalidateQueries()` on success. The `useCategories` hook in `src/hooks/useCategories.ts` is the canonical example of this pattern.
+
+Recipes with full relational data are fetched using Supabase nested selects (e.g. `recipe_ingredients(description, sort_order)`) and cast via `as unknown as RecipeWithDetails`.
+
+### Authentication
+
+`useAuth()` hook (`src/hooks/useAuth.ts`) returns `{ session, user, loading, isAuthenticated }` using `supabase.auth.onAuthStateChange`. The `Auth` component uses `@supabase/auth-ui-react` with Google OAuth and `ThemeSupa` theme.
+
+Images are uploaded to the `recipe-images` storage bucket with path `{userId}/{recipeId}-{timestamp}.{ext}`.
+
+---
+
+## Post-Migration Architecture (target)
+
+Once `docs/MIGRATION.md` is executed, the stack becomes:
+
+**Stack:** React 18 + TypeScript + Vite, Neon Postgres (DB), Clerk (Auth), Vercel Blob (Storage), Vercel Serverless Functions (API), TanStack React Query v5, React Router v6, shadcn/ui + Tailwind CSS.
+
+### Environment Variables (post-migration)
+
+| Variable | Accessible from |
+|---|---|
+| `VITE_CLERK_PUBLISHABLE_KEY` | Browser (Vite exposes `VITE_*`) |
+| `CLERK_SECRET_KEY` | API routes only (no `VITE_` prefix) |
+| `DATABASE_URL` | API routes only (auto-injected by Neon Vercel integration) |
+| `BLOB_READ_WRITE_TOKEN` | API routes only (auto-injected by Vercel Blob) |
+
+### API Routes (`/api`)
+
+```
+api/
+  _db.ts                   # getDb() — Neon tagged-template SQL helper
+  _auth.ts                 # requireAuth(header) — Clerk JWT verification
+  categories.ts            # GET /api/categories
+  categories/[id].ts       # PUT /api/categories/:id
+  recipes/
+    index.ts               # POST /api/recipes
+    recommended.ts         # GET /api/recipes/recommended
+    search.ts              # GET /api/recipes/search?q=
+    upload.ts              # POST /api/recipes/upload → Vercel Blob
+  category/[slug].ts       # GET /api/category/:slug
+  recipe/[id].ts           # GET + PUT + DELETE /api/recipe/:id
+```
+
+- Public routes (no auth): all GETs
+- Authenticated routes (require `Authorization: Bearer <clerk_token>`): all mutations
+- `api/_db.ts` uses `neon()` tagged-template from `@neondatabase/serverless`
+- `api/_auth.ts` uses `createClerkClient` from `@clerk/backend`
+
+### Frontend API Client (post-migration)
+
+`src/lib/apiClient.ts` — shared `apiFetch<T>(path, options)` wrapper that attaches Clerk JWT when `getToken` is provided. `getToken` comes from `useAuth()` (Clerk) and is passed as a parameter to mutation functions — it cannot be called inside `queryFn`/`mutationFn` directly since those are not React hooks.
+
+### Authentication (post-migration)
+
+`useAuth()` hook (`src/hooks/useAuth.ts`) wraps Clerk's `useAuth` + `useUser`, preserving the same `{ session, user, loading, isAuthenticated, getToken }` return shape. `Auth.tsx` uses `<SignedIn>`, `<SignedOut>`, `<SignInButton mode="modal">`, `<SignOutButton>` from `@clerk/clerk-react`.
+
+### Types (post-migration)
+
+`src/types/index.ts` — plain TypeScript interfaces (`Category`, `Recipe`, `RecipeWithDetails`, etc.) replacing the auto-generated Supabase `Tables<'...'>` generics.
+
+---
+
+## General Notes
+
+### Path Alias
+
+`@/` resolves to `src/`. TypeScript strict mode is **off** (`strict: false`, `strictNullChecks: false`, `noImplicitAny: false`).
+
+### UI Components
+
+`src/components/ui/` contains shadcn/ui components — don't modify these directly; use the shadcn CLI to add/update them. Custom app components live in `src/components/`. Form schemas with Zod are in `src/schemas/`.
+
+### vercel.json
+
+The SPA rewrite rule must exclude `/api/*` so Vercel routes those requests to serverless functions instead of `index.html`:
+```json
+{
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
+  ]
+}
+```
