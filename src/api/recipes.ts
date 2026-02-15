@@ -15,16 +15,15 @@ export async function createRecipe(
   if (image_file && image_file.length > 0) {
     const file = image_file[0];
     const token = await getToken();
+    if (!token) throw new Error('לא מחובר — יש להתחבר מחדש לפני שמירה');
     const res = await fetch(`/api/recipes/upload?filename=${encodeURIComponent(file.name)}`, {
       method: 'POST',
-      headers: {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      },
+      headers: { Authorization: `Bearer ${token}` },
       body: file,
     });
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || 'Image upload failed');
+      throw new Error(err.error || `העלאת התמונה נכשלה (${res.status})`);
     }
     const data = await res.json();
     image_url = data.url;
