@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { put } from '@vercel/blob';
-import { requireAuth } from '../_auth';
+import { requireAuth } from '../_auth.js';
 
 export const config = {
   api: {

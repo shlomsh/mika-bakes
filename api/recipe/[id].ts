@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { neon } from '@neondatabase/serverless';
-import { getDb } from '../_db';
-import { requireAuth } from '../_auth';
+import { getDb } from '../_db.js';
+import { requireAuth } from '../_auth.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { id } = req.query;
