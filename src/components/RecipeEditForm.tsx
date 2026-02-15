@@ -51,7 +51,7 @@ const RecipeEditForm: React.FC<RecipeEditFormProps> = ({ recipe, onCancel, onSav
 
   const mutation = useMutation({
     mutationFn: (args: { recipeId: string; values: RecipeEditFormValues & { recommended?: boolean } }) =>
-      updateRecipeInDb({ ...args, getToken }),
+      updateRecipeInDb({ ...args, getToken, currentImageUrl: recipe.image_url }),
     onSuccess: () => {
       toast({ title: "הצלחה!", description: "המתכון עודכן בהצלחה." });
       onSaveSuccess();

@@ -5,10 +5,12 @@ export async function updateRecipeInDb({
   recipeId,
   values,
   getToken,
+  currentImageUrl,
 }: {
   recipeId: string;
   values: RecipeEditFormValues & { recommended?: boolean };
   getToken: () => Promise<string | null>;
+  currentImageUrl?: string | null;
 }) {
   const {
     name, description, ingredients, instructions, sauces,
@@ -17,7 +19,7 @@ export async function updateRecipeInDb({
   } = values;
 
   // 1. Upload image if a new one is provided
-  let image_url: string | undefined;
+  let image_url: string | undefined = currentImageUrl ?? undefined;
   if (image_file && image_file.length > 0) {
     const file = image_file[0];
     const token = await getToken();
@@ -39,6 +41,7 @@ export async function updateRecipeInDb({
   const body: Record<string, any> = {
     name,
     description: description || null,
+    image_url: image_url ?? null,
     category_id: category_id || null,
     recommended: recommended ?? false,
     ingredients: ingredients.map((ing, i) => ({ description: ing.description, sort_order: i + 1 })),
@@ -48,10 +51,6 @@ export async function updateRecipeInDb({
     garnish_ingredients: (garnish_ingredients || []).map((g, i) => ({ description: g.description, sort_order: i + 1 })),
     garnish_instructions: (garnish_instructions || []).map((g, i) => ({ description: g.description, step_number: i + 1 })),
   };
-
-  if (image_url !== undefined) {
-    body.image_url = image_url;
-  }
 
   // 3. Update via API
   await apiFetch(`/api/recipe/${recipeId}`, {

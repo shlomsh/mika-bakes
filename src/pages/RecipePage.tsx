@@ -63,6 +63,7 @@ const RecipePage: React.FC = () => {
 
   const handleSaveSuccess = () => {
     setIsEditing(false);
+    queryClient.invalidateQueries({ queryKey: ['recipe', recipeId || null] });
     queryClient.invalidateQueries({ queryKey: ['recommendedRecipes'] });
     queryClient.invalidateQueries({ queryKey: ['recipes'] });
     refetch();
