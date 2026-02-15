@@ -138,12 +138,28 @@ Mutations call `queryClient.invalidateQueries()` on success. The `useCategories`
 
 ### vercel.json
 
-The SPA rewrite rule must exclude `/api/*` so Vercel routes those requests to serverless functions instead of `index.html`:
+The SPA rewrite rule excludes `/api/*` and Vite's internal dev paths so requests are routed correctly:
 ```json
 {
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/((?!api/|src/|@|node_modules/).*)", "destination": "/index.html" }
   ]
 }
 ```
+
+### ESM Import Extensions
+
+`package.json` has `"type": "module"`, which means Node runs all files as ESM. In production, Node's ESM resolver requires **explicit `.js` extensions** on relative imports. All `api/` files must use `.js` extensions even though the source files are `.ts`:
+
+```ts
+// ✅ Correct
+import { getDb } from './_db.js';
+import { requireAuth } from '../_auth.js';
+
+// ❌ Will crash in production (ERR_MODULE_NOT_FOUND)
+import { getDb } from './_db';
+import { requireAuth } from '../_auth';
+```
+
+> Note: `vercel dev` (local) works without extensions because it uses its own TypeScript bundler. The production Node ESM runtime is strict.
