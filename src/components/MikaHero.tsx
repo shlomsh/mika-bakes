@@ -3,7 +3,7 @@ import React from "react";
 const MikaHero: React.FC = () => <section className="relative bg-pastelYellow rounded-3xl shadow-lg p-8 flex flex-col lg:flex-row-reverse items-center w-full h-full min-h-[380px] justify-between overflow-hidden gap-8" dir="rtl">
     {/* Image section */}
     <div className="flex-1 flex justify-center items-center mb-6 lg:mb-0">
-      <img src="/lovable-uploads/bf32f2f4-c8ee-4e85-9887-739052ac4f30.png" alt="עוגיות קאפקייקס צבעוניות" className="w-64 h-64 object-cover border-4 border-white shadow-lg rounded-3xl" style={{
+      <img src="/uploads/bf32f2f4-c8ee-4e85-9887-739052ac4f30.png" alt="עוגיות קאפקייקס צבעוניות" className="w-64 h-64 object-cover border-4 border-white shadow-lg rounded-3xl" style={{
       maxWidth: "350px",
       maxHeight: "350px"
     }} />

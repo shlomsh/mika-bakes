@@ -13,13 +13,13 @@ interface SEOHeadProps {
 const SEOHead: React.FC<SEOHeadProps> = ({
   title = "ספר המתכונים של מיקה",
   description = "האפליקציה הביתית של מיקה לכל מתכוני קינוחים, מאפים ובישולים!",
-  image = "/lovable-uploads/ba509ec5-29e1-4ea7-9d37-63b4c65f5cef.png",
+  image = "/uploads/ba509ec5-29e1-4ea7-9d37-63b4c65f5cef.png",
   url,
   type = "website"
 }) => {
   // Ensure we have a full URL for the image
   const getFullImageUrl = (imageUrl: string) => {
-    if (!imageUrl) return `${window.location.origin}/lovable-uploads/ba509ec5-29e1-4ea7-9d37-63b4c65f5cef.png`;
+    if (!imageUrl) return `${window.location.origin}/uploads/ba509ec5-29e1-4ea7-9d37-63b4c65f5cef.png`;
     if (imageUrl.startsWith('http')) return imageUrl;
     return `${window.location.origin}${imageUrl}`;
   };

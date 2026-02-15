@@ -125,7 +125,7 @@ const RecipePage: React.FC = () => {
   // Prepare SEO data
   const recipeTitle = `${recipe.name} - ספר המתכונים של מיקה`;
   const recipeDescription = recipe.description || `מתכון ל${recipe.name} מהאוסף של מיקה`;
-  const recipeImage = recipe.image_url || '/lovable-uploads/ba509ec5-29e1-4ea7-9d37-63b4c65f5cef.png';
+  const recipeImage = recipe.image_url || '/uploads/ba509ec5-29e1-4ea7-9d37-63b4c65f5cef.png';
   const recipeUrl = `/recipe/${recipeId}`;
 
   if (isEditing) {
