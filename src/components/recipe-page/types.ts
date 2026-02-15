@@ -1,5 +1,6 @@
-
-import { Recipe as BaseRecipe } from '@/data/sampleRecipes';
+// Local type aliases used by recipe-page components.
+// The canonical RecipeWithDetails is in src/types/index.ts.
+export type { RecipeWithDetails } from '@/types';
 
 export interface Ingredient {
   description: string;
@@ -30,18 +31,3 @@ export interface GarnishInstruction {
   description: string;
   step_number: number;
 }
-
-export type RecipeWithDetails = Omit<BaseRecipe, 'ingredients' | 'instructions'> & {
-  recommended: boolean;
-  recipe_ingredients: Ingredient[];
-  recipe_instructions: Instruction[];
-  recipe_sauces: Sauce[];
-  recipe_sauce_ingredients: SauceIngredient[];
-  recipe_garnish_ingredients: GarnishIngredient[];
-  recipe_garnish_instructions: GarnishInstruction[];
-  categories: {
-    id: string;
-    slug: string;
-    name: string;
-  } | null;
-};

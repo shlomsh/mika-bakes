@@ -11,6 +11,7 @@ import { Loader2, Save, Blend, Sparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { useCategories } from '@/hooks/useCategories';
+import { useAuth } from '@/hooks/useAuth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { recipeSchema, RecipeFormValues } from '@/schemas/recipeSchema';
 import { createRecipe } from '@/api/recipes';
@@ -26,6 +27,7 @@ const RecipeCreateForm: React.FC<RecipeCreateFormProps> = ({ categoryId }) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const { categories, isLoadingCategories } = useCategories();
+  const { getToken } = useAuth();
   const [imagePreview, setImagePreview] = React.useState<string | null>(null);
   const queryClient = useQueryClient();
   
@@ -46,7 +48,7 @@ const RecipeCreateForm: React.FC<RecipeCreateFormProps> = ({ categoryId }) => {
   const { onChange: onImageChange, ...restImageRegister } = form.register("image_file");
 
   const mutation = useMutation({
-    mutationFn: createRecipe,
+    mutationFn: (values: RecipeFormValues) => createRecipe(values, getToken),
     onSuccess: (recipeId) => {
       toast({ title: "הצלחה!", description: "המתכון נוצר בהצלחה." });
       queryClient.invalidateQueries({ queryKey: ['recipes'] });

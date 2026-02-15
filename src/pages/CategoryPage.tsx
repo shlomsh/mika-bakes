@@ -1,12 +1,11 @@
-
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
+import { apiFetch } from '@/lib/apiClient';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, BookOpen, Plus } from 'lucide-react';
-import { Recipe, Category } from '@/data/sampleRecipes';
+import type { Recipe, Category } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 
 const fetchCategoryAndRecipes = async (categorySlug: string | undefined): Promise<{ category: Category | null; recipes: Recipe[] }> => {
@@ -14,50 +13,11 @@ const fetchCategoryAndRecipes = async (categorySlug: string | undefined): Promis
     return { category: null, recipes: [] };
   }
 
-  // 1. Fetch the category by slug
-  const { data: categoryData, error: categoryError } = await supabase
-    .from('categories')
-    .select('*')
-    .eq('slug', categorySlug)
-    .single();
-
-  if (categoryError || !categoryData) {
-    console.error('Error fetching category:', categoryError);
+  try {
+    return await apiFetch<{ category: Category; recipes: Recipe[] }>(`/api/category/${categorySlug}`);
+  } catch {
     return { category: null, recipes: [] };
   }
-
-  // 2. Fetch recipes for that category
-  const { data: recipesData, error: recipesError } = await supabase
-    .from('recipes')
-    .select(`
-      id,
-      name,
-      description,
-      image_url,
-      category_id,
-      created_at,
-      updated_at,
-      categories (
-        id,
-        slug,
-        name,
-        created_at,
-        updated_at
-      )
-    `)
-    .eq('category_id', categoryData.id);
-
-  if (recipesError) {
-    console.error('Error fetching recipes:', recipesError);
-    return { category: categoryData, recipes: [] };
-  }
-  
-  // Ensure recipesData is not null. It should conform to Recipe[] due to the select and types.
-  // Type casting might be needed if Supabase types and frontend types diverge significantly,
-  // but the changes to Recipe interface and select statement should align them.
-  const recipes: Recipe[] = recipesData || [];
-
-  return { category: categoryData, recipes };
 };
 
 const CategoryPage: React.FC = () => {
@@ -67,7 +27,7 @@ const CategoryPage: React.FC = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['category', categoryName],
     queryFn: () => fetchCategoryAndRecipes(categoryName),
-    enabled: !!categoryName, // Only run query if categoryName is defined
+    enabled: !!categoryName,
   });
 
   const category = data?.category;
@@ -114,7 +74,7 @@ const CategoryPage: React.FC = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center p-8" style={{ background: "#faf9f7", direction: "rtl" }}>
       <header className="w-full max-w-4xl mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
@@ -139,7 +99,7 @@ const CategoryPage: React.FC = () => {
                 </Button>
              </>
           )}
-          
+
           {/* Desktop Back Button */}
           <Button asChild variant="outline" className="text-choco border-choco hover:bg-choco/10 hidden sm:inline-flex">
             <Link to="/">
@@ -161,10 +121,10 @@ const CategoryPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recipesForCategory.map((recipe: Recipe) => (
               <Card key={recipe.id} className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:scale-105">
-                <img 
-                  src={recipe.image_url || `https://via.placeholder.com/400x200/f0e0d0/a08070?text=${encodeURIComponent(recipe.name)}`} 
-                  alt={recipe.name} 
-                  className="w-full h-48 object-cover" 
+                <img
+                  src={recipe.image_url || `https://via.placeholder.com/400x200/f0e0d0/a08070?text=${encodeURIComponent(recipe.name)}`}
+                  alt={recipe.name}
+                  className="w-full h-48 object-cover"
                 />
                 <CardHeader>
                   <CardTitle className="font-fredoka text-xl text-choco">{recipe.name}</CardTitle>

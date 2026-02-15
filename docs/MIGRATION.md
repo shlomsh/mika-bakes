@@ -1,5 +1,26 @@
 # Migration Plan: Supabase → Neon + Clerk + Vercel Blob + Vercel API Routes
 
+## Status
+
+| Phase | Description | Status |
+|-------|-------------|--------|
+| 1 | Infrastructure Setup | ✅ Complete |
+| 2 | Package Changes | ✅ Complete |
+| 3 | Fix `vercel.json` | ✅ Complete |
+| 4 | New Type System | ✅ Complete |
+| 5 | Auth Migration | ✅ Complete |
+| 6 | Create Vercel API Routes | ✅ Complete |
+| 7 | Frontend API Client | ✅ Complete |
+| 8 | Delete Supabase Artifacts | ✅ Complete |
+
+**Migration complete and verified locally.** All phases done. UI renders correctly with live data from Neon Postgres. Ready for deploy.
+
+### Known Issues
+- **`vercel dev` has a local dev bug**: The SPA rewrite in `vercel.json` intercepts Vite's internal dev routes (`/@vite/client`, `/src/main.tsx`), returning HTML instead of JS. **Workaround**: run `vercel dev -l 3001` (API) + `npm run dev` (frontend with `/api` proxy to `:3001`) separately. This does not affect production deployment.
+- **Recipe images**: Old `/lovable-uploads/` image URLs from Supabase storage still work in production (Supabase bucket is public). Image migration to Vercel Blob is deferred — new uploads will use Vercel Blob.
+
+---
+
 ## Context
 
 The app currently queries Supabase directly from the browser for all DB access, auth (Google OAuth), and image storage. The goal is to remove Supabase entirely and replace each concern:
@@ -10,15 +31,17 @@ The app currently queries Supabase directly from the browser for all DB access, 
 
 ---
 
-## Phase 1: Infrastructure Setup (manual, before any code)
+## Phase 1: Infrastructure Setup ✅ COMPLETE
 
-1. In **Vercel dashboard**: connect Neon Postgres via Marketplace → auto-injects `DATABASE_URL`
-2. In **Vercel dashboard**: connect Vercel Blob store → auto-injects `BLOB_READ_WRITE_TOKEN`
-3. Create a **Clerk app** at clerk.com, enable Google OAuth → copy `PUBLISHABLE_KEY` and `SECRET_KEY`
-4. Add to Vercel env vars (and `.env.local` locally):
-   - `VITE_CLERK_PUBLISHABLE_KEY` (exposed to browser via Vite)
-   - `CLERK_SECRET_KEY` (server-only, no `VITE_` prefix)
-5. Recreate the **Postgres schema** in Neon using the 8 `CREATE TABLE` statements from the existing Supabase migrations (no RLS needed — auth is now enforced in API routes). Optionally migrate existing data.
+1. ✅ Connected Neon Postgres via Vercel Marketplace → `DATABASE_URL` auto-injected
+2. ✅ Connected Vercel Blob store → `BLOB_READ_WRITE_TOKEN` auto-injected
+3. ✅ Created Clerk app at clerk.com with Google OAuth enabled
+4. ✅ All env vars added to Vercel and `.env.local`:
+   - `VITE_CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `BLOB_READ_WRITE_TOKEN`
+5. ✅ Schema + data imported into Neon from Supabase backup (`scripts/neon-import.sql`, stripped of RLS/policies)
+   - Clean DDL reference: `scripts/neon-schema.sql`
+   - Verified all 8 tables with correct row counts (3 categories, 22 recipes, 209 ingredients, etc.)
+6. ⏳ **Deferred — image migration**: Supabase `recipe-images` bucket is still public, so existing `image_url` values work. Will re-upload to Vercel Blob and update URLs after the code migration is complete.
 
 ---
 
@@ -26,9 +49,11 @@ The app currently queries Supabase directly from the browser for all DB access, 
 
 ```bash
 npm remove @supabase/supabase-js @supabase/auth-ui-react @supabase/auth-ui-shared
-npm install @clerk/clerk-react @neondatabase/serverless @vercel/blob
+npm install @clerk/clerk-react @clerk/backend @neondatabase/serverless @vercel/blob
 npm install -D @vercel/node
 ```
+
+> **Note:** `@clerk/backend` is needed by `api/_auth.ts` for server-side JWT verification (`createClerkClient`). `@clerk/clerk-react` is the browser-side SDK.
 
 ---
 
@@ -149,8 +174,8 @@ export async function requireAuth(authHeader: string | null): Promise<string> {
 
 ### Authenticated mutation routes (require `Authorization: Bearer <token>`)
 - `PUT /api/categories/[id]` — update category fields
-- `POST /api/recipes` — insert recipe + 6 related tables (sequential, no transaction needed for single-user app)
-- `PUT /api/recipe/[id]` — update recipe metadata + delete-reinsert all 6 related tables
+- `POST /api/recipes` — insert recipe + 6 related tables inside a transaction (use `neon(url, { fullResults: true })` with `BEGIN`/`COMMIT`/`ROLLBACK` to avoid partial data if any insert fails)
+- `PUT /api/recipe/[id]` — update recipe metadata + delete-reinsert all 6 related tables (also wrap in a transaction)
 - `DELETE /api/recipe/[id]` — `DELETE FROM recipes WHERE id = $id` (cascades via FK)
 - `POST /api/recipes/upload` — stream file body to Vercel Blob via `put(filename, req, { access: 'public' })`, return `{ url }`; set `export const config = { api: { bodyParser: false } }`
 
@@ -198,7 +223,11 @@ export async function apiFetch<T>(
 
 **Key pattern**: `getToken` (from `useAuth()`) is passed down to mutation functions. Read-only `queryFn`s do not need it.
 
-**Update `RecipeCreateForm.tsx` and `RecipeEditForm.tsx`** to get `getToken` from `useAuth()` and pass it to `createRecipe` / `updateRecipeInDb`.
+**Update `RecipeCreateForm.tsx` and `RecipeEditForm.tsx`** to get `getToken` from `useAuth()` and pass it to `createRecipe` / `updateRecipeInDb`. Specifically:
+- Import `useAuth` in both form components
+- Destructure `getToken` from the hook: `const { getToken } = useAuth();`
+- Update `createRecipe(values)` → `createRecipe(values, getToken)` and `updateRecipeInDb({ recipeId, values })` → `updateRecipeInDb({ recipeId, values, getToken })`
+- Update the function signatures in `src/api/recipes.ts` and `src/api/recipeApi.ts` to accept and forward `getToken` to `apiFetch`
 
 ---
 
@@ -226,12 +255,18 @@ export async function apiFetch<T>(
 
 ## Verification
 
-1. Run `vercel dev` (not `vite dev`) — this runs Vite frontend + serverless functions together with env vars
-2. Visit `/` — categories load without auth
-3. Sign in via Clerk Google OAuth modal — confirm auth state updates
-4. Navigate to a recipe — confirm all related data loads
-5. Create a new recipe with an image — confirm Vercel Blob URL appears in DB
-6. Edit a recipe — confirm delete-reinsert pattern works
-7. Delete a recipe — confirm cascade works
-8. Sign out — confirm mutation buttons are hidden
-9. Deploy to Vercel — confirm `DATABASE_URL` and `BLOB_READ_WRITE_TOKEN` are set in environment
+### Local Dev (verified ✅)
+1. ✅ Run `vercel dev -l 3001` (API) + `npm run dev` (frontend) — Vite proxies `/api` to `:3001`
+2. ✅ Visit `/` — homepage renders with hero, categories sidebar, recommended recipes
+3. ✅ Categories load from Neon Postgres — 3 categories (מאפים מלוחים, קינוחים, תבשילים)
+4. ✅ Navigate to recipe page — full detail with ingredients + numbered instructions
+5. ✅ Category page — grid of recipe cards loads correctly
+6. ✅ API routes respond correctly (`/api/categories`, `/api/recipes/recommended`, `/api/recipes/search`, `/api/category/:slug`, `/api/recipe/:id`)
+7. ✅ RTL Hebrew layout renders correctly
+
+### Post-Deploy (to verify after `vercel deploy`)
+- [ ] Visit production URL — categories + recipes load
+- [ ] Sign in via Clerk Google OAuth — confirm auth works
+- [ ] Create a new recipe with image — confirm Vercel Blob upload
+- [ ] Edit/delete a recipe — confirm mutations work
+- [ ] Sign out — confirm mutation buttons hidden

@@ -15,13 +15,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 
-import type { Tables } from "@/integrations/supabase/types";
+import type { Category } from "@/types";
 import CategoryForm, { categoryFormSchema } from "@/components/CategoryForm";
 import { useToast } from "@/components/ui/use-toast";
 import { useCategories } from "@/hooks/useCategories";
 import AppHeader from "@/components/AppHeader";
 
-type Category = Tables<'categories'>;
 type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 
 const Index = () => {

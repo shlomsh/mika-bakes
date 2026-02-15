@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/integrations/supabase/client";
+import { apiFetch } from "@/lib/apiClient";
 import { Loader2 } from "lucide-react";
 
 type RecipePick = {
@@ -13,17 +13,7 @@ type RecipePick = {
 };
 
 const fetchRecommendedRecipes = async (): Promise<RecipePick[]> => {
-  const { data, error } = await supabase
-    .from('recipes')
-    .select('id, name, description, image_url')
-    .eq('recommended', true);
-
-  if (error) {
-    console.error('Error fetching recommended recipes:', error);
-    throw new Error('Could not fetch recommended recipes');
-  }
-
-  return data || [];
+  return apiFetch<RecipePick[]>('/api/recipes/recommended');
 };
 
 const RecipePicks: React.FC = () => {
@@ -39,7 +29,7 @@ const RecipePicks: React.FC = () => {
       </section>
     );
   }
-  
+
   return (
     <section className="bg-white rounded-3xl shadow-lg p-7 mt-8" dir="rtl">
       <h2 className="font-fredoka text-2xl mb-4 text-choco">מומלצים</h2>
@@ -49,10 +39,10 @@ const RecipePicks: React.FC = () => {
         <div className="flex flex-col gap-4">
           {recipes.map((recipe) => (
             <div className="flex items-center gap-4 p-3 rounded-xl bg-pastelYellow/20" key={recipe.id}>
-              <img 
-                src={recipe.image_url || `https://via.placeholder.com/150/f0e0d0/a08070?text=${encodeURIComponent(recipe.name)}`} 
-                alt={recipe.name} 
-                className="w-16 h-16 object-cover rounded-xl border-2 border-pastelYellow shadow" 
+              <img
+                src={recipe.image_url || `https://via.placeholder.com/150/f0e0d0/a08070?text=${encodeURIComponent(recipe.name)}`}
+                alt={recipe.name}
+                className="w-16 h-16 object-cover rounded-xl border-2 border-pastelYellow shadow"
               />
               <div className="flex-1">
                 <div className="flex items-center gap-2 font-fredoka text-lg text-choco flex-row">

@@ -14,9 +14,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import type { Tables } from '@/integrations/supabase/types';
-
-type Category = Tables<'categories'>;
+import type { Category } from '@/types';
 
 export const categoryFormSchema = z.object({
   name: z.string().min(2, { message: "שם קטגוריה חייב להכיל לפחות 2 תווים." }),

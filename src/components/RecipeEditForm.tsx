@@ -8,6 +8,7 @@ import { Loader2, Save, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { recipeEditSchema, RecipeEditFormValues } from '@/schemas/recipeEditSchema';
 import { updateRecipeInDb } from '@/api/recipeApi';
+import { useAuth } from '@/hooks/useAuth';
 import BasicInfoSection from './recipe-edit/BasicInfoSection';
 import IngredientsSection from './recipe-edit/IngredientsSection';
 import InstructionsSection from './recipe-edit/InstructionsSection';
@@ -28,6 +29,7 @@ interface RecipeEditFormProps {
 
 const RecipeEditForm: React.FC<RecipeEditFormProps> = ({ recipe, onCancel, onSaveSuccess }) => {
   const { toast } = useToast();
+  const { getToken } = useAuth();
   const [imagePreview, setImagePreview] = React.useState<string | null>(recipe.image_url);
   const [isRecommended, setIsRecommended] = React.useState(recipe.recommended || false);
   const { categories, isLoadingCategories } = useCategories();
@@ -48,7 +50,8 @@ const RecipeEditForm: React.FC<RecipeEditFormProps> = ({ recipe, onCancel, onSav
   });
 
   const mutation = useMutation({
-    mutationFn: updateRecipeInDb,
+    mutationFn: (args: { recipeId: string; values: RecipeEditFormValues & { recommended?: boolean } }) =>
+      updateRecipeInDb({ ...args, getToken }),
     onSuccess: () => {
       toast({ title: "הצלחה!", description: "המתכון עודכן בהצלחה." });
       onSaveSuccess();

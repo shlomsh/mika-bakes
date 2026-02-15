@@ -1,10 +1,8 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import type { Tables } from "@/integrations/supabase/types";
+import type { Category } from "@/types";
 import { RecipeSearch } from './RecipeSearch';
-
-type Category = Tables<'categories'>;
 
 interface AppHeaderProps {
   categories: Category[] | undefined;

@@ -3,7 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import DynamicIcon from "./DynamicIcon";
 import { useAuth } from "@/hooks/useAuth";
-import type { Tables } from "@/integrations/supabase/types";
+import type { Category } from "@/types";
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Edit } from "lucide-react";
 import {
@@ -12,8 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-type Category = Tables<'categories'>;
 
 interface CategoryCardsProps {
   categories: Category[];
