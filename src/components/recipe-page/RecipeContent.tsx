@@ -1,5 +1,4 @@
 import React from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardFooter } from '@/components/ui/card';
 import { ListChecks, Utensils, Soup, Sparkles } from 'lucide-react';
 import { RecipeWithDetails } from './types';
 
@@ -7,150 +6,155 @@ interface RecipeContentProps {
   recipe: RecipeWithDetails;
 }
 
+const IngredientChecklist: React.FC<{ ingredients: { description: string }[]; accentColor: string }> = ({ ingredients, accentColor }) => (
+  <div className="rounded-2xl overflow-hidden border border-choco/5">
+    {ingredients.map((ingredient, index) => (
+      <div
+        key={index}
+        className={`flex items-center gap-3 px-4 py-2.5 animate-fade-up ${index % 2 === 0 ? accentColor : 'bg-white'}`}
+        style={{ animationDelay: `${index * 35}ms` }}
+      >
+        <span className="w-2 h-2 rounded-full bg-choco/30 shrink-0" />
+        <span className="text-choco/90 leading-snug">{ingredient.description}</span>
+      </div>
+    ))}
+  </div>
+);
+
+const StepList: React.FC<{ steps: { step_number: number; description: string }[]; accentBg: string; useHtml?: boolean }> = ({ steps, accentBg, useHtml }) => (
+  <ol className="w-full list-none space-y-6 text-choco/90">
+    {steps.map((step) => (
+      <li key={step.step_number} className="flex items-start gap-x-4 animate-fade-up" style={{ animationDelay: `${step.step_number * 60}ms` }}>
+        <div className={`step-circle ${accentBg}`}>
+          {step.step_number}
+        </div>
+        {useHtml ? (
+          <div
+            className="flex-1 pt-1 leading-relaxed text-choco/90"
+            dangerouslySetInnerHTML={{ __html: step.description }}
+          />
+        ) : (
+          <p className="flex-1 pt-1 leading-relaxed text-choco/90">
+            {step.description}
+          </p>
+        )}
+      </li>
+    ))}
+  </ol>
+);
+
 const RecipeContent: React.FC<RecipeContentProps> = ({ recipe }) => {
   return (
-    <Card className="overflow-hidden shadow-xl">
-      <div className="md:flex">
-        <div className="md:w-1/2">
-          <img
-            src={recipe.image_url || `https://via.placeholder.com/600x400/f0e0d0/a08070?text=${encodeURIComponent(recipe.name)}`}
-            alt={recipe.name}
-            className="w-full h-64 md:h-full object-cover md:rounded-r-lg md:rounded-l-none"
-          />
-        </div>
-        <div className="md:w-1/2 flex flex-col">
-          <CardHeader className="pb-3">
-            {recipe.description && (
-              <CardDescription className="text-choco/80 text-md leading-relaxed">
-                {recipe.description}
-              </CardDescription>
-            )}
-          </CardHeader>
-          <CardContent className="flex-grow pt-0">
-            {recipe.recipe_ingredients && recipe.recipe_ingredients.length > 0 && (
-              <div className="mb-6">
-                <h2 className="font-fredoka text-xl text-choco mb-2 flex items-center">
-                  <ListChecks className="ml-2 text-pastelOrange" />
-                  מצרכים:
-                </h2>
-                <ul className="list-disc list-outside space-y-1 text-choco/90 bg-pastelYellow/20 p-4 pr-6 rounded-md">
-                  {recipe.recipe_ingredients.map((ingredient, index) => (
-                    <li key={index}>{ingredient.description}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </CardContent>
-        </div>
+    <div className="animate-fade-up">
+      {/* Full-bleed hero image with overlay */}
+      <div className="relative rounded-3xl overflow-hidden shadow-xl mb-8">
+        <img
+          src={recipe.image_url || `https://via.placeholder.com/600x400/f0e0d0/a08070?text=${encodeURIComponent(recipe.name)}`}
+          alt={recipe.name}
+          className="w-full h-72 md:h-96 object-cover"
+          style={{ borderRadius: 0 }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-choco/60 via-choco/10 to-transparent" />
+        {recipe.description && (
+          <div className="absolute bottom-0 right-0 left-0 p-6 md:p-8">
+            <p className="text-white/90 text-lg md:text-xl font-inter max-w-2xl leading-relaxed drop-shadow-lg">
+              {recipe.description}
+            </p>
+          </div>
+        )}
       </div>
-      {recipe.recipe_instructions && recipe.recipe_instructions.length > 0 && (
-        <CardFooter className="flex-col items-start p-6 bg-white border-t border-choco/10">
+
+      {/* Ingredients section */}
+      {recipe.recipe_ingredients && recipe.recipe_ingredients.length > 0 && (
+        <section className="bg-white rounded-3xl shadow-lg p-6 md:p-8 mb-4 animate-fade-up delay-100">
           <h2 className="font-fredoka text-xl text-choco mb-4 flex items-center">
-            <Utensils className="ml-2 text-pastelBlue" />
+            <ListChecks className="ml-2 text-pastelOrange hover-wobble" />
+            מצרכים:
+          </h2>
+          <IngredientChecklist ingredients={recipe.recipe_ingredients} accentColor="bg-pastelYellow/20" />
+        </section>
+      )}
+
+      {/* Wavy divider */}
+      <div className="divider-wavy my-2" />
+
+      {/* Instructions section */}
+      {recipe.recipe_instructions && recipe.recipe_instructions.length > 0 && (
+        <section className="bg-white rounded-3xl shadow-lg p-6 md:p-8 mb-4 animate-fade-up delay-200">
+          <h2 className="font-fredoka text-xl text-choco mb-6 flex items-center">
+            <Utensils className="ml-2 text-pastelBlue hover-wobble" />
             אופן ההכנה:
           </h2>
-          <ol className="w-full list-none space-y-6 text-choco/90">
-            {recipe.recipe_instructions.map((step) => (
-              <li key={step.step_number} className="flex items-start gap-x-4">
-                <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-pastelBlue text-choco font-fredoka text-lg font-bold">
-                  {step.step_number}
-                </div>
-                <div
-                  className="flex-1 pt-1 leading-relaxed text-choco/90"
-                  dangerouslySetInnerHTML={{ __html: step.description }}
-                />
-              </li>
-            ))}
-          </ol>
-        </CardFooter>
+          <StepList steps={recipe.recipe_instructions} accentBg="bg-pastelBlue" useHtml />
+        </section>
       )}
+
+      {/* Sauce section */}
       {(recipe.recipe_sauces && recipe.recipe_sauces.length > 0 || (recipe.recipe_sauce_ingredients && recipe.recipe_sauce_ingredients.length > 0)) && (
-        <CardFooter className="flex-col items-start p-6 bg-white rounded-b-lg border-t border-choco/10">
-          <h2 className="font-fredoka text-xl text-choco mb-4 flex items-center">
-            <Soup className="ml-2 text-pastelOrange" />
-            רוטב:
-          </h2>
+        <>
+          <div className="divider-wavy my-2" />
+          <section className="bg-white rounded-3xl shadow-lg p-6 md:p-8 mb-4 animate-fade-up delay-300">
+            <h2 className="font-fredoka text-xl text-choco mb-4 flex items-center">
+              <Soup className="ml-2 text-pastelOrange hover-wobble" />
+              רוטב:
+            </h2>
 
-          {recipe.recipe_sauce_ingredients && recipe.recipe_sauce_ingredients.length > 0 && (
-            <div className="w-full mb-6">
-              <h3 className="font-fredoka text-lg text-choco mb-2 flex items-center">
-                <ListChecks className="ml-2 text-pastelOrange" />
-                מצרכים לרוטב:
-              </h3>
-              <ul className="list-disc list-outside space-y-1 text-choco/90 bg-pastelOrange/20 p-4 pr-6 rounded-md">
-                {recipe.recipe_sauce_ingredients.map((ingredient, index) => (
-                  <li key={index}>{ingredient.description}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {recipe.recipe_sauces && recipe.recipe_sauces.length > 0 && (
-            <div className="w-full">
-                <h3 className="font-fredoka text-lg text-choco mb-4 flex items-center">
-                    <Utensils className="ml-2 text-pastelOrange" />
-                    אופן הכנת הרוטב:
+            {recipe.recipe_sauce_ingredients && recipe.recipe_sauce_ingredients.length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-fredoka text-lg text-choco mb-3 flex items-center">
+                  <ListChecks className="ml-2 text-pastelOrange" />
+                  מצרכים לרוטב:
                 </h3>
-                <ol className="w-full list-none space-y-6 text-choco/90">
-                    {recipe.recipe_sauces.map((step) => (
-                    <li key={step.step_number} className="flex items-start gap-x-4">
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-pastelOrange text-choco font-fredoka text-lg font-bold">
-                        {step.step_number}
-                        </div>
-                        <p className="flex-1 pt-1 leading-relaxed text-choco/90">
-                        {step.description}
-                        </p>
-                    </li>
-                    ))}
-                </ol>
-            </div>
-          )}
-        </CardFooter>
+                <IngredientChecklist ingredients={recipe.recipe_sauce_ingredients} accentColor="bg-pastelOrange/20" />
+              </div>
+            )}
+
+            {recipe.recipe_sauces && recipe.recipe_sauces.length > 0 && (
+              <div>
+                <h3 className="font-fredoka text-lg text-choco mb-4 flex items-center">
+                  <Utensils className="ml-2 text-pastelOrange" />
+                  אופן הכנת הרוטב:
+                </h3>
+                <StepList steps={recipe.recipe_sauces} accentBg="bg-pastelOrange" />
+              </div>
+            )}
+          </section>
+        </>
       )}
+
+      {/* Garnish section */}
       {(recipe.recipe_garnish_instructions && recipe.recipe_garnish_instructions.length > 0 || (recipe.recipe_garnish_ingredients && recipe.recipe_garnish_ingredients.length > 0)) && (
-        <CardFooter className="flex-col items-start p-6 bg-white rounded-b-lg border-t border-choco/10">
-          <h2 className="font-fredoka text-xl text-choco mb-4 flex items-center">
-            <Sparkles className="ml-2 text-pastelYellow" />
-            תוספת:
-          </h2>
+        <>
+          <div className="divider-wavy my-2" />
+          <section className="bg-white rounded-3xl shadow-lg p-6 md:p-8 mb-4 animate-fade-up delay-400">
+            <h2 className="font-fredoka text-xl text-choco mb-4 flex items-center">
+              <Sparkles className="ml-2 text-pastelYellow hover-wobble" />
+              תוספת:
+            </h2>
 
-          {recipe.recipe_garnish_ingredients && recipe.recipe_garnish_ingredients.length > 0 && (
-            <div className="w-full mb-6">
-              <h3 className="font-fredoka text-lg text-choco mb-2 flex items-center">
-                <ListChecks className="ml-2 text-pastelYellow" />
-                מצרכים לתוספת:
-              </h3>
-              <ul className="list-disc list-outside space-y-1 text-choco/90 bg-pastelYellow/20 p-4 pr-6 rounded-md">
-                {recipe.recipe_garnish_ingredients.map((ingredient, index) => (
-                  <li key={index}>{ingredient.description}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {recipe.recipe_garnish_instructions && recipe.recipe_garnish_instructions.length > 0 && (
-            <div className="w-full">
-                <h3 className="font-fredoka text-lg text-choco mb-4 flex items-center">
-                    <Utensils className="ml-2 text-pastelYellow" />
-                    אופן הכנת התוספת:
+            {recipe.recipe_garnish_ingredients && recipe.recipe_garnish_ingredients.length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-fredoka text-lg text-choco mb-3 flex items-center">
+                  <ListChecks className="ml-2 text-pastelYellow" />
+                  מצרכים לתוספת:
                 </h3>
-                <ol className="w-full list-none space-y-6 text-choco/90">
-                    {recipe.recipe_garnish_instructions.map((step) => (
-                    <li key={step.step_number} className="flex items-start gap-x-4">
-                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-pastelYellow text-choco font-fredoka text-lg font-bold">
-                        {step.step_number}
-                        </div>
-                        <p className="flex-1 pt-1 leading-relaxed text-choco/90">
-                        {step.description}
-                        </p>
-                    </li>
-                    ))}
-                </ol>
-            </div>
-          )}
-        </CardFooter>
+                <IngredientChecklist ingredients={recipe.recipe_garnish_ingredients} accentColor="bg-pastelYellow/20" />
+              </div>
+            )}
+
+            {recipe.recipe_garnish_instructions && recipe.recipe_garnish_instructions.length > 0 && (
+              <div>
+                <h3 className="font-fredoka text-lg text-choco mb-4 flex items-center">
+                  <Utensils className="ml-2 text-pastelYellow" />
+                  אופן הכנת התוספת:
+                </h3>
+                <StepList steps={recipe.recipe_garnish_instructions} accentBg="bg-pastelYellow" />
+              </div>
+            )}
+          </section>
+        </>
       )}
-    </Card>
+    </div>
   );
 };
 

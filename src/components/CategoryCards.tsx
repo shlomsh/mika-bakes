@@ -23,14 +23,14 @@ const CategoryCards: React.FC<CategoryCardsProps> = ({ categories, onEdit }) => 
 
   return (
     <aside className="flex flex-col gap-4 w-full" dir="rtl">
-      {categories.map((cat) => (
-        <div key={cat.id} className="relative group">
+      {categories.map((cat, index) => (
+        <div key={cat.id} className="relative group animate-fade-up" style={{ animationDelay: `${index * 60}ms` }}>
           <Link to={`/category/${cat.slug}`} className="no-underline">
             <div
-              className={`rounded-2xl shadow-lg p-4 flex items-center gap-4 ${cat.color || 'bg-gray-200'} relative transition-transform hover:scale-105 cursor-pointer`}
+              className={`rounded-2xl shadow-lg p-4 flex items-center gap-4 ${cat.color || 'bg-gray-200'} relative card-lift cursor-pointer texture-noise`}
               dir="rtl"
             >
-              {cat.icon && <DynamicIcon name={cat.icon} className="w-10 h-10 text-choco opacity-85 shrink-0" strokeWidth={2} />}
+              {cat.icon && <DynamicIcon name={cat.icon} className="w-10 h-10 text-choco opacity-85 shrink-0 hover-wobble" strokeWidth={2} />}
               <div className="flex-grow">
                 <span className="font-fredoka text-xl text-choco tracking-wide">{cat.name}</span>
                 {cat.description && <p className="mt-1 text-choco/75 text-sm leading-tight">{cat.description}</p>}

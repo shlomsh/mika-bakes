@@ -10,9 +10,12 @@ interface AppHeaderProps {
 
 const AppHeader: React.FC<AppHeaderProps> = ({ categories }) => {
   return (
-    <header dir="rtl" className="w-full flex flex-col sm:flex-row items-center sm:justify-between gap-4 py-4 px-6 bg-white border-b border-gray-100 shadow-sm">
+    <header dir="rtl" className="w-full flex flex-col sm:flex-row items-center sm:justify-between gap-4 py-4 px-6 bg-gradient-to-l from-white via-white to-pastelYellow/30 border-b border-choco/5 shadow-sm animate-fade-in">
       <div className="flex items-center gap-3">
-        <Link to="/" className="font-fredoka text-2xl text-choco tracking-tight">ספר המתכונים של מיקה</Link>
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <span className="text-3xl group-hover:animate-bounce transition-transform" role="img" aria-hidden="true">🧁</span>
+          <span className="font-fredoka text-2xl text-choco tracking-tight">ספר המתכונים של מיקה</span>
+        </Link>
       </div>
       <div className="flex items-center gap-4">
         <RecipeSearch />

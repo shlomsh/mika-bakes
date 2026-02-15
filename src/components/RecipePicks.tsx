@@ -31,14 +31,21 @@ const RecipePicks: React.FC = () => {
   }
 
   return (
-    <section className="bg-white rounded-3xl shadow-lg p-7 mt-8" dir="rtl">
-      <h2 className="font-fredoka text-2xl mb-4 text-choco">מומלצים</h2>
+    <section className="bg-white rounded-3xl shadow-lg p-7 mt-8 animate-fade-up delay-200" dir="rtl">
+      <h2 className="font-fredoka text-2xl mb-4 text-choco flex items-center gap-2">
+        <span className="text-xl" aria-hidden="true">⭐</span>
+        מומלצים
+      </h2>
       {isError || !recipes || recipes.length === 0 ? (
         <p className="text-choco/80">לא נמצאו מתכונים מומלצים כרגע.</p>
       ) : (
         <div className="flex flex-col gap-4">
-          {recipes.map((recipe) => (
-            <div className="flex items-center gap-4 p-3 rounded-xl bg-pastelYellow/20" key={recipe.id}>
+          {recipes.map((recipe, index) => (
+            <div
+              className="flex items-center gap-4 p-3 rounded-xl bg-pastelYellow/20 card-lift animate-fade-up"
+              key={recipe.id}
+              style={{ animationDelay: `${300 + index * 80}ms` }}
+            >
               <img
                 src={recipe.image_url || `https://via.placeholder.com/150/f0e0d0/a08070?text=${encodeURIComponent(recipe.name)}`}
                 alt={recipe.name}

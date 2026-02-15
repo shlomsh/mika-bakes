@@ -77,7 +77,7 @@ const CategoryPage: React.FC = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center p-8" style={{ background: "#faf9f7", direction: "rtl" }}>
-      <header className="w-full max-w-4xl mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+      <header className="w-full max-w-4xl mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 animate-fade-up">
         <h1 className="font-fredoka text-3xl text-choco w-full text-right sm:w-auto">
           מתכונים בקטגוריית: {formattedCategoryName}
         </h1>
@@ -118,14 +118,21 @@ const CategoryPage: React.FC = () => {
       </header>
       <main className="w-full max-w-4xl">
         {recipesForCategory.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {recipesForCategory.map((recipe: Recipe) => (
-              <Card key={recipe.id} className="flex flex-col overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out hover:scale-105">
-                <img
-                  src={recipe.image_url || `https://via.placeholder.com/400x200/f0e0d0/a08070?text=${encodeURIComponent(recipe.name)}`}
-                  alt={recipe.name}
-                  className="w-full h-48 object-cover"
-                />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {recipesForCategory.map((recipe: Recipe, index: number) => (
+              <Card
+                key={recipe.id}
+                className="flex flex-col overflow-hidden shadow-lg card-lift animate-fade-up"
+                style={{ animationDelay: `${index * 80}ms` }}
+              >
+                <div className="relative overflow-hidden">
+                  <img
+                    src={recipe.image_url || `https://via.placeholder.com/400x200/f0e0d0/a08070?text=${encodeURIComponent(recipe.name)}`}
+                    alt={recipe.name}
+                    className="w-full h-48 object-cover transition-transform duration-500 hover:scale-110"
+                    style={{ borderRadius: '1.25rem 1.25rem 0 0' }}
+                  />
+                </div>
                 <CardHeader>
                   <CardTitle className="font-fredoka text-xl text-choco">{recipe.name}</CardTitle>
                   {recipe.description && (
