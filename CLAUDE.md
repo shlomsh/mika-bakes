@@ -9,6 +9,7 @@ npm run dev        # Start Vite dev server (frontend only, proxies /api to :3001
 npm run build      # Production build (output: dist/)
 npm run lint       # ESLint
 npm run preview    # Preview production build locally
+npm run test:e2e   # Playwright E2E tests (requires running app or BASE_URL)
 ```
 
 ### Local Development (full stack)
@@ -27,7 +28,7 @@ Then open http://localhost:5173.
 
 > **Note:** `vercel dev` alone doesn't work for local dev — its SPA rewrite intercepts Vite's internal dev routes. The two-process setup above is the recommended approach. This does not affect production deployment.
 
-No test suite exists in this codebase.
+No unit test suite exists. E2E tests use Playwright (`e2e/` directory) and run against a live deployment in CI (`.github/workflows/e2e.yml`).
 
 ---
 
@@ -108,7 +109,7 @@ Clean DDL reference: `scripts/neon-schema.sql`.
 
 ### Types
 
-`src/types/index.ts` — plain TypeScript interfaces (`Category`, `Recipe`, `RecipeWithDetails`) replacing the old auto-generated Supabase types.
+`src/types/index.ts` — plain TypeScript interfaces (`Category`, `Recipe`, `RecipeWithDetails`).
 
 ### React Query Patterns
 

@@ -1,19 +1,20 @@
 # Mika Bakes
 
-A recipe management app for Mika's baking recipes. Built with React, TypeScript, Vite, shadcn/ui, Neon Postgres, and Clerk.
+A Hebrew-language recipe management app for Mika's baking recipes. Built with React, TypeScript, and Vite, deployed on Vercel.
 
 ## Tech Stack
 
-- **Frontend**: React 18, TypeScript, Vite
-- **UI**: shadcn/ui, Tailwind CSS, Radix UI
-- **Auth**: Clerk
-- **Database**: Neon Postgres (serverless)
-- **Storage**: Vercel Blob (recipe images)
-- **API**: Vercel Serverless Functions
-- **State**: TanStack React Query v5
-- **Routing**: React Router v6
-- **Forms**: React Hook Form + Zod
-- **Hosting**: Vercel
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, TypeScript, Vite |
+| UI | shadcn/ui, Tailwind CSS, Radix UI |
+| Auth | Clerk (Google OAuth) |
+| Database | Neon Postgres (serverless) |
+| Storage | Vercel Blob (recipe images) |
+| API | Vercel Serverless Functions |
+| State | TanStack React Query v5 |
+| Routing | React Router v6 |
+| Forms | React Hook Form + Zod |
 
 ## Development
 
@@ -23,7 +24,7 @@ A recipe management app for Mika's baking recipes. Built with React, TypeScript,
 npm install
 ```
 
-### Full-stack local dev (recommended)
+### Full-stack local dev
 
 Run two processes in separate terminals:
 
@@ -37,7 +38,15 @@ npm run dev
 
 Then open http://localhost:5173.
 
-> `vercel dev` alone doesn't work for local dev — its SPA rewrite intercepts Vite's internal dev routes.
+> **Note:** `vercel dev` alone doesn't work for local dev — its SPA rewrite intercepts Vite's internal dev routes. The two-process setup is the recommended approach.
+
+### E2E Tests
+
+```bash
+npm run test:e2e
+```
+
+Playwright E2E tests live in `e2e/` and run automatically against Vercel preview deployments via GitHub Actions (`.github/workflows/e2e.yml`).
 
 ## Environment Variables
 
@@ -50,7 +59,7 @@ Then open http://localhost:5173.
 
 ## Deployment
 
-Deployed on Vercel. Push to `main` to trigger a deployment.
+Deployed on Vercel. Push to `main` to trigger a production deployment.
 
 - Build command: `npm run build`
 - Output directory: `dist`
