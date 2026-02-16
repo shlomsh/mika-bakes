@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import CategoryPage from "./pages/CategoryPage";
 import RecipePage from "./pages/RecipePage";
 import NewRecipePage from "./pages/NewRecipePage";
+import PWAReloadPrompt from "./components/PWAReloadPrompt";
 
 const queryClient = new QueryClient();
 
@@ -19,6 +20,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <PWAReloadPrompt />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
