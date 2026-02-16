@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/apiClient";
 import { Loader2 } from "lucide-react";
@@ -41,8 +40,9 @@ const RecipePicks: React.FC = () => {
       ) : (
         <div className="flex flex-col gap-4">
           {recipes.map((recipe, index) => (
-            <div
-              className="flex items-center gap-4 p-3 rounded-xl bg-pastelYellow/20 card-lift animate-fade-up"
+            <Link
+              to={`/recipe/${recipe.id}`}
+              className="flex items-center gap-4 p-3 rounded-xl bg-pastelYellow/20 card-lift animate-fade-up no-underline"
               key={recipe.id}
               style={{ animationDelay: `${300 + index * 80}ms` }}
             >
@@ -57,16 +57,7 @@ const RecipePicks: React.FC = () => {
                 </div>
                 <div className="text-choco/80 text-sm">{recipe.description}</div>
               </div>
-              <Button
-                asChild
-                size="sm"
-                className="mr-auto bg-pastelBlue hover:bg-pastelBlue/90 text-choco font-bold shrink-0"
-              >
-                <Link to={`/recipe/${recipe.id}`}>
-                  הצג מתכון
-                </Link>
-              </Button>
-            </div>
+            </Link>
           ))}
         </div>
       )}

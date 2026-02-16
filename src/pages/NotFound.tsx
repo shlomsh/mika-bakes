@@ -14,8 +14,9 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-off-white p-8" dir="rtl">
-      <div className="text-center animate-scale-in max-w-md">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-mesh p-8" dir="rtl">
+      <span className="baking-pattern" aria-hidden="true" />
+      <div className="text-center animate-scale-in max-w-md relative z-10">
         {/* Burnt cookie illustration */}
         <div className="text-8xl mb-6 animate-float">🍪</div>
 

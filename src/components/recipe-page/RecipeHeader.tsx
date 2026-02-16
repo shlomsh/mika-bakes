@@ -26,7 +26,7 @@ interface RecipeHeaderProps {
 
 const RecipeHeader: React.FC<RecipeHeaderProps> = ({ recipe, isAuthenticated, isDeletePending, onEdit, onDelete }) => {
   return (
-    <header className="w-full max-w-5xl mb-6 md:mb-10 flex flex-col">
+    <header className="w-full max-w-5xl mb-6 md:mb-10 flex flex-col relative z-10">
       <div className="flex items-center gap-2 sm:gap-4 self-end mb-4 md:mb-6">
         {isAuthenticated && (
           <>
@@ -111,7 +111,7 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({ recipe, isAuthenticated, is
       <div>
         <h1 className="font-fredoka text-3xl md:text-4xl text-choco text-center md:text-right">{recipe.name}</h1>
         {recipe.categories && (
-          <Link to={`/category/${recipe.categories.slug}`} className="text-pastelOrange hover:underline font-fredoka text-lg">
+          <Link to={`/category/${recipe.categories.slug}`} className="text-choco/60 hover:text-choco hover:underline font-fredoka text-lg transition-colors">
             קטגוריה: {recipe.categories.name}
           </Link>
         )}

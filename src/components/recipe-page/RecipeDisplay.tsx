@@ -14,9 +14,10 @@ interface RecipeDisplayProps {
 
 const RecipeDisplay: React.FC<RecipeDisplayProps> = (props) => {
   return (
-    <div className="min-h-screen w-full flex flex-col items-center p-4 md:p-8 animate-fade-in" style={{ background: "#faf9f7", direction: "rtl" }}>
+    <div className="min-h-screen w-full flex flex-col items-center p-4 md:p-8 animate-fade-in bg-gradient-mesh" style={{ direction: "rtl" }}>
+      <span className="baking-pattern" aria-hidden="true" />
       <RecipeHeader {...props} />
-      <main className="w-full max-w-5xl">
+      <main className="w-full max-w-5xl relative z-10">
         <RecipeContent recipe={props.recipe} />
       </main>
     </div>

@@ -39,7 +39,7 @@ const CategoryPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen w-full flex flex-col items-center justify-center p-8" style={{ background: "#faf9f7", direction: "rtl" }}>
+      <div className="min-h-screen w-full flex flex-col items-center justify-center p-8 bg-gradient-mesh" style={{ direction: "rtl" }}>
         <p className="text-choco text-xl">טוען מתכונים...</p>
       </div>
     );
@@ -47,7 +47,7 @@ const CategoryPage: React.FC = () => {
 
   if (error || !category) {
     return (
-      <div className="min-h-screen w-full flex flex-col items-center p-8" style={{ background: "#faf9f7", direction: "rtl" }}>
+      <div className="min-h-screen w-full flex flex-col items-center p-8 bg-gradient-mesh" style={{ direction: "rtl" }}>
         <header className="w-full max-w-4xl mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <h1 className="font-fredoka text-3xl text-choco w-full text-right sm:w-auto">
             קטגוריה לא נמצאה
@@ -76,8 +76,10 @@ const CategoryPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center p-8" style={{ background: "#faf9f7", direction: "rtl" }}>
-      <header className="w-full max-w-4xl mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 animate-fade-up">
+    <div className="min-h-screen w-full flex flex-col items-center p-8 bg-floating-shapes" style={{ direction: "rtl" }}>
+      <span className="baking-pattern" aria-hidden="true" />
+      <span className="bg-blob-extra" aria-hidden="true" />
+      <header className="w-full max-w-4xl mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 animate-fade-up relative z-10">
         <h1 className="font-fredoka text-3xl text-choco w-full text-right sm:w-auto">
           מתכונים בקטגוריית: {formattedCategoryName}
         </h1>
@@ -116,7 +118,7 @@ const CategoryPage: React.FC = () => {
           </Button>
         </div>
       </header>
-      <main className="w-full max-w-4xl">
+      <main className="w-full max-w-4xl relative z-10">
         {recipesForCategory.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {recipesForCategory.map((recipe: Recipe, index: number) => (
