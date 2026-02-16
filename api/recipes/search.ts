@@ -21,8 +21,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       LIMIT 10
     `;
     return res.status(200).json(rows);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('GET /api/recipes/search error:', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
   }
 }

@@ -8,16 +8,12 @@ import { ArrowRight, BookOpen, Plus } from 'lucide-react';
 import type { Recipe, Category } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 
-const fetchCategoryAndRecipes = async (categorySlug: string | undefined): Promise<{ category: Category | null; recipes: Recipe[] }> => {
+const fetchCategoryAndRecipes = async (categorySlug: string | undefined): Promise<{ category: Category; recipes: Recipe[] }> => {
   if (!categorySlug) {
-    return { category: null, recipes: [] };
+    throw new Error('Category slug is required');
   }
 
-  try {
-    return await apiFetch<{ category: Category; recipes: Recipe[] }>(`/api/category/${categorySlug}`);
-  } catch {
-    return { category: null, recipes: [] };
-  }
+  return apiFetch<{ category: Category; recipes: Recipe[] }>(`/api/category/${categorySlug}`);
 };
 
 const CategoryPage: React.FC = () => {
@@ -45,12 +41,13 @@ const CategoryPage: React.FC = () => {
     );
   }
 
-  if (error || !category) {
+  if (error) {
+    const is404 = (error as Error & { status?: number }).status === 404;
     return (
       <div className="min-h-screen w-full flex flex-col items-center p-8 bg-gradient-mesh" style={{ direction: "rtl" }}>
         <header className="w-full max-w-4xl mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
           <h1 className="font-fredoka text-3xl text-choco w-full text-right sm:w-auto">
-            קטגוריה לא נמצאה
+            {is404 ? 'קטגוריה לא נמצאה' : 'שגיאה בטעינת הקטגוריה'}
           </h1>
           <div className="flex self-end sm:self-auto">
             <Button asChild variant="outline" className="text-choco border-choco hover:bg-choco/10 hidden sm:inline-flex">
@@ -68,7 +65,9 @@ const CategoryPage: React.FC = () => {
         </header>
         <main className="w-full max-w-4xl">
           <p className="text-choco/80 text-lg text-center">
-            לא הצלחנו למצוא את הקטגוריה המבוקשת. נסה לחזור לדף הבית ולבחור קטגוריה אחרת.
+            {is404
+              ? 'לא הצלחנו למצוא את הקטגוריה המבוקשת. נסה לחזור לדף הבית ולבחור קטגוריה אחרת.'
+              : 'אירעה שגיאה בטעינת הקטגוריה. נסה שוב מאוחר יותר.'}
           </p>
         </main>
       </div>

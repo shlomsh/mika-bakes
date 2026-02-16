@@ -9,8 +9,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     await requireAuth(req.headers.authorization ?? null);
-  } catch (err: any) {
-    return res.status(err.status || 401).json({ error: err.message });
+  } catch (err: unknown) {
+    const status = (err as { status?: number }).status || 401;
+    return res.status(status).json({ error: err instanceof Error ? err.message : String(err) });
   }
 
   try {
@@ -99,8 +100,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       await sql`ROLLBACK`;
       throw innerErr;
     }
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('POST /api/recipes error:', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
   }
 }

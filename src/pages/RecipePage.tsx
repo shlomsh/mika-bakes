@@ -45,7 +45,7 @@ const RecipePage: React.FC = () => {
     onSuccess: () => {
       toast({ title: "הצלחה!", description: "המתכון נמחק בהצלחה." });
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
-      queryClient.invalidateQueries({ queryKey: ['recipePicks'] });
+      queryClient.invalidateQueries({ queryKey: ['recommendedRecipes'] });
       navigate('/');
     },
     onError: (err: Error) => {

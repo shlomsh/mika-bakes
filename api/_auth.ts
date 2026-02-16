@@ -6,7 +6,8 @@ export async function requireAuth(authHeader: string | null): Promise<string> {
   try {
     const { sub } = await verifyToken(token, { secretKey: process.env.CLERK_SECRET_KEY! });
     return sub; // Clerk userId
-  } catch (err: any) {
-    throw Object.assign(new Error(`Unauthorized: ${err.message}`), { status: 401 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
+    throw Object.assign(new Error(`Unauthorized: ${message}`), { status: 401 });
   }
 }

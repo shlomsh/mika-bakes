@@ -38,7 +38,7 @@ export async function updateRecipeInDb({
   }
 
   // 2. Build the update payload
-  const body: Record<string, any> = {
+  const body: Record<string, unknown> = {
     name,
     description: description || null,
     image_url: image_url ?? null,

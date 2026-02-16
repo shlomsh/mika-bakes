@@ -10,8 +10,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const sql = getDb();
     const rows = await sql`SELECT * FROM categories ORDER BY name`;
     return res.status(200).json(rows);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('GET /api/categories error:', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
   }
 }

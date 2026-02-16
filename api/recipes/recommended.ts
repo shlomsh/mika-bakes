@@ -14,8 +14,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       WHERE recommended = true
     `;
     return res.status(200).json(rows);
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('GET /api/recipes/recommended error:', err);
-    return res.status(500).json({ error: err.message });
+    return res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
   }
 }

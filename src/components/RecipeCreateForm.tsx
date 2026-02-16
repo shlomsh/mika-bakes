@@ -52,7 +52,7 @@ const RecipeCreateForm: React.FC<RecipeCreateFormProps> = ({ categoryId }) => {
     onSuccess: (recipeId) => {
       toast({ title: "הצלחה!", description: "המתכון נוצר בהצלחה." });
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
-      queryClient.invalidateQueries({ queryKey: ['recipePicks'] });
+      queryClient.invalidateQueries({ queryKey: ['recommendedRecipes'] });
       queryClient.invalidateQueries({ queryKey: ['category', categoryId] });
       navigate(`/recipe/${recipeId}`);
     },
