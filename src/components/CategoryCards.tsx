@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import TransitionLink from "@/components/TransitionLink";
 import DynamicIcon from "./DynamicIcon";
 import { useAuth } from "@/hooks/useAuth";
 import type { Category } from "@/types";
@@ -25,18 +25,22 @@ const CategoryCards: React.FC<CategoryCardsProps> = ({ categories, onEdit }) => 
     <aside className="flex flex-col gap-4 w-full" dir="rtl">
       {categories.map((cat, index) => (
         <div key={cat.id} className="relative group animate-fade-up" style={{ animationDelay: `${index * 60}ms` }}>
-          <Link to={`/category/${cat.slug}`} className="no-underline">
+          <TransitionLink to={`/category/${cat.slug}`} className="no-underline">
             <div
-              className={`rounded-2xl shadow-lg p-4 flex items-center gap-4 ${cat.color || 'bg-gray-200'} relative card-lift cursor-pointer texture-noise`}
+              className={`rounded-2xl shadow-lg p-4 flex items-center gap-4 ${cat.color || 'bg-gray-200'} relative card-lift cursor-pointer texture-noise ring-1 ring-white/60`}
               dir="rtl"
             >
-              {cat.icon && <DynamicIcon name={cat.icon} className="w-10 h-10 text-choco opacity-85 shrink-0 hover-wobble" strokeWidth={2} />}
+              {cat.icon && (
+                <div className="bg-white/30 rounded-xl p-1.5 shrink-0 transition-transform duration-300 group-hover:scale-105">
+                  <DynamicIcon name={cat.icon} className="w-10 h-10 text-choco opacity-85" strokeWidth={2} />
+                </div>
+              )}
               <div className="flex-grow">
-                <span className="font-fredoka text-xl text-choco tracking-wide">{cat.name}</span>
+                <span className="font-fredoka text-xl text-choco tracking-wide transition-transform duration-300 group-hover:-translate-y-0.5 inline-block">{cat.name}</span>
                 {cat.description && <p className="mt-1 text-choco/75 text-sm leading-tight">{cat.description}</p>}
               </div>
             </div>
-          </Link>
+          </TransitionLink>
           {isAuthenticated && (
             <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <DropdownMenu dir="rtl">

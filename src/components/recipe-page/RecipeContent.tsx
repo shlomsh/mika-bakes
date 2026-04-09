@@ -15,7 +15,7 @@ const IngredientChecklist: React.FC<{ ingredients: { description: string }[]; ac
         style={{ animationDelay: `${index * 35}ms` }}
       >
         <span className="w-2 h-2 rounded-full bg-choco/30 shrink-0" />
-        <span className="text-choco/90 leading-snug">{ingredient.description}</span>
+        <span className="font-frankRuhl text-choco/90 leading-snug">{ingredient.description}</span>
       </div>
     ))}
   </div>
@@ -30,11 +30,11 @@ const StepList: React.FC<{ steps: { step_number: number; description: string }[]
         </div>
         {useHtml ? (
           <div
-            className="flex-1 pt-1 leading-relaxed text-choco/90"
+            className="flex-1 pt-1 leading-relaxed text-choco/90 font-frankRuhl"
             dangerouslySetInnerHTML={{ __html: step.description }}
           />
         ) : (
-          <p className="flex-1 pt-1 leading-relaxed text-choco/90">
+          <p className="flex-1 pt-1 leading-relaxed text-choco/90 font-frankRuhl">
             {step.description}
           </p>
         )}
@@ -52,12 +52,12 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe }) => {
           src={recipe.image_url || `https://via.placeholder.com/600x400/f0e0d0/a08070?text=${encodeURIComponent(recipe.name)}`}
           alt={recipe.name}
           className="w-full h-72 md:h-96 object-cover"
-          style={{ borderRadius: 0 }}
+          style={{ borderRadius: 0, viewTransitionName: `recipe-hero-${recipe.id}` } as React.CSSProperties}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-choco/60 via-choco/10 to-transparent" />
         {recipe.description && (
           <div className="absolute bottom-0 right-0 left-0 p-6 md:p-8">
-            <p className="text-white/90 text-lg md:text-xl font-inter max-w-2xl leading-relaxed drop-shadow-lg">
+            <p className="text-white/90 text-lg md:text-xl font-frankRuhl max-w-2xl leading-relaxed drop-shadow-lg">
               {recipe.description}
             </p>
           </div>

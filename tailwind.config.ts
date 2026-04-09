@@ -35,7 +35,8 @@ export default {
     extend: {
       fontFamily: {
         fredoka: ['Fredoka', 'ui-rounded', 'sans-serif'],
-        inter: ['Inter', 'sans-serif']
+        inter: ['Inter', 'sans-serif'],
+        frankRuhl: ['Frank Ruhl Libre', 'serif'],
       },
       colors: {
         pastelYellow: "#fecaca", // red-200

@@ -20,6 +20,7 @@ import CategoryForm, { categoryFormSchema } from "@/components/CategoryForm";
 import { useToast } from "@/components/ui/use-toast";
 import { useCategories } from "@/hooks/useCategories";
 import AppHeader from "@/components/AppHeader";
+import CategoryCardSkeleton from "@/components/skeletons/CategoryCardSkeleton";
 
 type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 
@@ -81,7 +82,7 @@ const Index = () => {
               <div className="flex justify-between items-center mb-4">
                 <h2 className="font-fredoka text-2xl text-choco">קטגוריות</h2>
               </div>
-              {isLoadingCategories ? <p>טוען קטגוריות...</p> : 
+              {isLoadingCategories ? <div className="flex flex-col gap-4">{[0,1,2,3].map(i => <CategoryCardSkeleton key={i} />)}</div> :
                 <CategoryCards 
                   categories={categories || []}
                   onEdit={handleEdit}
@@ -96,7 +97,7 @@ const Index = () => {
             <div className="flex justify-between items-center mb-4">
               <h2 className="font-fredoka text-2xl text-choco">קטגוריות</h2>
             </div>
-            {isLoadingCategories ? <p>טוען קטגוריות...</p> : 
+            {isLoadingCategories ? <div className="flex flex-col gap-4">{[0,1,2,3].map(i => <CategoryCardSkeleton key={i} />)}</div> :
               <CategoryCards 
                 categories={categories || []}
                 onEdit={handleEdit}
