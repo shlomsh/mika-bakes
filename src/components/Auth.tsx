@@ -21,7 +21,7 @@ const AuthComponent = () => {
           <Button
             variant="ghost"
             size="sm"
-            className="text-choco/60 hover:text-choco hover:bg-choco/5 text-xs font-normal"
+            className="text-choco/60 hover:text-choco hover:bg-choco/5 active:text-choco active:bg-choco/10 text-xs font-normal"
           >
             <User className="h-3 w-3 ml-1" />
             התחבר

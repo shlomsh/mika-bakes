@@ -17,12 +17,22 @@ export default {
     'bg-pastelBlue',
     'text-pastelOrange',
     'text-pastelBlue',
+    'text-coral',
+    'bg-coral',
     'bg-pastelYellow/20',
     'bg-pastelOrange/20',
-    // Add new colors from DB to ensure they are generated
+    'bg-pastelGreen/20',
+    'bg-pastelBlue/20',
+    // Tailwind defaults used by DB category colors
     'bg-rose-200',
     'bg-pink-200',
     'bg-red-200',
+    'bg-yellow-200',
+    'bg-sky-200',
+    'bg-orange-200',
+    'bg-green-200',
+    'bg-purple-200',
+    'bg-fuchsia-200',
   ],
   theme: {
     container: {
@@ -35,14 +45,14 @@ export default {
     extend: {
       fontFamily: {
         fredoka: ['Fredoka', 'ui-rounded', 'sans-serif'],
-        inter: ['Inter', 'sans-serif'],
         frankRuhl: ['Frank Ruhl Libre', 'serif'],
       },
       colors: {
-        pastelYellow: "#fecaca", // red-200
-        pastelBlue: "#fbcfe8",   // pink-200
-        pastelOrange: "#fecdd3", // rose-200
-        pastelGreen: "#f0abfc",  // fuchsia-300
+        pastelYellow: "#ffd4a8", // apricot peach
+        pastelBlue: "#bae6fd",   // sky blue
+        pastelOrange: "#fed7aa", // warm peach-orange
+        pastelGreen: "#bbf7d0",  // mint green
+        coral: "#f97316",        // bold accent / emphasis
         choco: "#614e3e",
         'off-white': '#faf9f7',
       },

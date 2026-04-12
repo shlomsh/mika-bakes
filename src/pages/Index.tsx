@@ -5,7 +5,6 @@ import * as z from 'zod';
 import MikaHero from "../components/MikaHero";
 import CategoryCards from "../components/CategoryCards";
 import RecipePicks from "../components/RecipePicks";
-import AuthComponent from "@/components/Auth";
 import SEOHead from "@/components/SEOHead";
 import {
   Dialog,
@@ -56,20 +55,11 @@ const Index = () => {
   return (
     <>
       <SEOHead />
-      <main 
-        className="min-h-screen w-full flex flex-col" 
-        style={{
-          backgroundImage: "linear-gradient(rgba(250, 249, 247, 0.85), rgba(250, 249, 247, 0.85)), url('/uploads/ba509ec5-29e1-4ea7-9d37-63b4c65f5cef.png')",
-          backgroundRepeat: 'repeat',
-          direction: "rtl"
-        }}
+      <main
+        className="min-h-screen w-full flex flex-col bg-gradient-mesh"
+        style={{ direction: "rtl" }}
       >
         <AppHeader categories={categories} />
-
-        {/* Add AuthComponent positioned separately from header */}
-        <div className="absolute top-20 left-4 sm:left-6 z-10">
-          <AuthComponent />
-        </div>
 
         {/* Main 2-column desktop grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 px-8 py-14 max-w-7xl mx-auto w-full flex-1 transition-all">

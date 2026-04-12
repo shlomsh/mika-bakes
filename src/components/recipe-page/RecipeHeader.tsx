@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Pencil, Trash2, ArrowRight } from 'lucide-react';
+import { Pencil, Trash2, Home } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { RecipeWithDetails } from './types';
+import Breadcrumb from '@/components/Breadcrumb';
 
 interface RecipeHeaderProps {
   recipe: RecipeWithDetails;
@@ -27,95 +28,46 @@ interface RecipeHeaderProps {
 const RecipeHeader: React.FC<RecipeHeaderProps> = ({ recipe, isAuthenticated, isDeletePending, onEdit, onDelete }) => {
   return (
     <header className="w-full max-w-5xl mb-6 md:mb-10 flex flex-col relative z-10">
-      <div className="flex items-center gap-2 sm:gap-4 self-end mb-4 md:mb-6">
-        {isAuthenticated && (
-          <>
-            {/* Desktop Edit Button */}
-            <Button variant="outline" onClick={onEdit} className="hidden sm:inline-flex">
-              <Pencil className="ml-2 h-4 w-4" />
-              ערוך מתכון
-            </Button>
-            {/* Mobile Edit Button */}
-            <Button variant="outline" size="icon" onClick={onEdit} className="sm:hidden" aria-label="ערוך מתכון">
-              <Pencil className="h-4 w-4" />
-            </Button>
-            
-            {/* Desktop Delete Button */}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" className="hidden sm:inline-flex">
-                  <Trash2 className="ml-2 h-4 w-4" />
-                  מחק מתכון
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent style={{direction: 'rtl'}}>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>האם אתה בטוח?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    פעולה זו לא ניתנת לביטול. פעולה זו תמחק לצמיתות את המתכון מהשרתים שלנו.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>ביטול</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={onDelete}
-                    disabled={isDeletePending}
-                  >
-                    {isDeletePending ? "מוחק..." : "מחק"}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+      <div className="flex items-start justify-between gap-4 mb-2">
+        <Breadcrumb items={[
+          { label: 'בית', to: '/', icon: <Home className="h-3.5 w-3.5" /> },
+          ...(recipe.categories ? [{ label: recipe.categories.name, to: `/category/${recipe.categories.slug}` }] : []),
+          { label: recipe.name },
+        ]} />
 
-            {/* Mobile Delete Button */}
+        {isAuthenticated && (
+          <div className="flex items-center gap-2 shrink-0">
+            <Button variant="outline" size="sm" onClick={onEdit} aria-label="ערוך מתכון">
+              <Pencil className="h-3.5 w-3.5 sm:ml-1.5" />
+              <span className="hidden sm:inline text-sm">ערוך</span>
+            </Button>
+
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="icon" className="sm:hidden" aria-label="מחק מתכון">
-                  <Trash2 className="h-4 w-4" />
+                <Button variant="destructive" size="sm" aria-label="מחק מתכון">
+                  <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </AlertDialogTrigger>
-              <AlertDialogContent style={{direction: 'rtl'}}>
+              <AlertDialogContent style={{ direction: 'rtl' }}>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>האם אתה בטוח?</AlertDialogTitle>
+                  <AlertDialogTitle>האם אתה בטוחה?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    פעולה זו לא ניתנת לביטול. פעולה זו תמחק לצמיתות את המתכון מהשרתים שלנו.
+                    פעולה זו תמחק לצמיתות את המתכון ולא ניתן לשחזרו.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>ביטול</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={onDelete}
-                    disabled={isDeletePending}
-                  >
-                    {isDeletePending ? "מוחק..." : "מחק"}
+                  <AlertDialogAction onClick={onDelete} disabled={isDeletePending}>
+                    {isDeletePending ? 'מוחק...' : 'מחק'}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-          </>
-        )}
-        {/* Desktop Back Button */}
-        <Button asChild variant="outline" className="hidden sm:inline-flex">
-          <Link to="/">
-            <ArrowRight className="ml-2 h-4 w-4" />
-            חזרה לדף הבית
-          </Link>
-        </Button>
-        {/* Mobile Back Button */}
-        <Button asChild variant="outline" size="icon" className="sm:hidden" aria-label="חזרה לדף הבית">
-          <Link to="/">
-            <ArrowRight className="h-4 w-4" />
-          </Link>
-        </Button>
-      </div>
-      <div>
-        <h1 className="font-fredoka text-3xl md:text-4xl text-choco text-center md:text-right">{recipe.name}</h1>
-        {recipe.categories && (
-          <Link to={`/category/${recipe.categories.slug}`} className="text-choco/60 hover:text-choco hover:underline font-fredoka text-lg transition-colors">
-            קטגוריה: {recipe.categories.name}
-          </Link>
+          </div>
         )}
       </div>
+
+      <h1 className="font-fredoka text-4xl md:text-5xl text-choco text-right mt-1 leading-tight">{recipe.name}</h1>
     </header>
   );
 };

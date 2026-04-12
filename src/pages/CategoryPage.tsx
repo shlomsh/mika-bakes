@@ -3,18 +3,19 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/apiClient';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight, BookOpen, Plus } from 'lucide-react';
+import { Plus, Home } from 'lucide-react';
+import DynamicIcon from '@/components/DynamicIcon';
 import type { Recipe, Category } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
-import TransitionLink from '@/components/TransitionLink';
+import RecipeCard from '@/components/RecipeCard';
 import RecipeCardSkeleton from '@/components/skeletons/RecipeCardSkeleton';
+import AppHeader from '@/components/AppHeader';
+import Breadcrumb from '@/components/Breadcrumb';
 
 const fetchCategoryAndRecipes = async (categorySlug: string | undefined): Promise<{ category: Category; recipes: Recipe[] }> => {
   if (!categorySlug) {
     throw new Error('Category slug is required');
   }
-
   return apiFetch<{ category: Category; recipes: Recipe[] }>(`/api/category/${categorySlug}`);
 };
 
@@ -37,12 +38,15 @@ const CategoryPage: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen w-full flex flex-col items-center p-8 bg-floating-shapes" style={{ direction: "rtl" }}>
-        <div className="w-full max-w-4xl mb-10">
-          <div className="skeleton h-9 w-64 rounded mb-2" />
-        </div>
-        <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {[0, 1, 2, 3, 4, 5].map((i) => <RecipeCardSkeleton key={i} />)}
+      <div className="min-h-screen w-full flex flex-col bg-floating-shapes" style={{ direction: 'rtl' }}>
+        <AppHeader />
+        <div className="flex flex-col items-center px-8 py-10 relative z-10">
+          <div className="w-full max-w-4xl mb-10">
+            <div className="skeleton h-10 w-56 rounded-xl" />
+          </div>
+          <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[0, 1, 2, 3, 4, 5].map((i) => <RecipeCardSkeleton key={i} />)}
+          </div>
         </div>
       </div>
     );
@@ -51,132 +55,74 @@ const CategoryPage: React.FC = () => {
   if (error) {
     const is404 = (error as Error & { status?: number }).status === 404;
     return (
-      <div className="min-h-screen w-full flex flex-col items-center p-8 bg-gradient-mesh" style={{ direction: "rtl" }}>
-        <header className="w-full max-w-4xl mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <h1 className="font-fredoka text-3xl text-choco w-full text-right sm:w-auto">
-            {is404 ? 'קטגוריה לא נמצאה' : 'שגיאה בטעינת הקטגוריה'}
-          </h1>
-          <div className="flex self-end sm:self-auto">
-            <Button asChild variant="outline" className="text-choco border-choco hover:bg-choco/10 hidden sm:inline-flex">
-              <Link to="/">
-                <ArrowRight className="ml-2 h-4 w-4" />
-                חזרה לדף הבית
-              </Link>
-            </Button>
-            <Button asChild variant="outline" size="icon" className="text-choco border-choco hover:bg-choco/10 sm:hidden">
-                <Link to="/" aria-label="חזרה לדף הבית">
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-            </Button>
-          </div>
-        </header>
-        <main className="w-full max-w-4xl">
-          <p className="text-choco/80 text-lg text-center">
-            {is404
-              ? 'לא הצלחנו למצוא את הקטגוריה המבוקשת. נסה לחזור לדף הבית ולבחור קטגוריה אחרת.'
-              : 'אירעה שגיאה בטעינת הקטגוריה. נסה שוב מאוחר יותר.'}
-          </p>
-        </main>
+      <div className="min-h-screen w-full flex flex-col bg-gradient-mesh" style={{ direction: 'rtl' }}>
+        <AppHeader />
+        <div className="flex flex-col items-center px-8 py-10 relative z-10">
+          <header className="w-full max-w-4xl mb-10">
+            <h1 className="font-fredoka text-3xl text-choco text-right">
+              {is404 ? 'קטגוריה לא נמצאה' : 'שגיאה בטעינת הקטגוריה'}
+            </h1>
+          </header>
+          <main className="w-full max-w-4xl">
+            <p className="text-choco/80 text-lg text-center">
+              {is404
+                ? 'לא הצלחנו למצוא את הקטגוריה המבוקשת. נסה לחזור לדף הבית ולבחור קטגוריה אחרת.'
+                : 'אירעה שגיאה בטעינת הקטגוריה. נסה שוב מאוחר יותר.'}
+            </p>
+          </main>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center p-8 bg-floating-shapes" style={{ direction: "rtl" }}>
+    <div className="min-h-screen w-full flex flex-col bg-floating-shapes" style={{ direction: 'rtl' }}>
       <span className="baking-pattern" aria-hidden="true" />
       <span className="bg-blob-extra" aria-hidden="true" />
-      <header className="w-full max-w-4xl mb-10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 animate-fade-up relative z-10">
-        <h1 className="font-fredoka text-3xl text-choco w-full text-right sm:w-auto">
-          מתכונים בקטגוריית: {formattedCategoryName}
-        </h1>
-        <div className="flex items-center gap-2 sm:gap-4 self-end sm:self-auto">
+      <AppHeader />
+
+      <div className="flex flex-col items-center px-8 py-10 relative z-10 flex-1">
+        <header className="w-full max-w-4xl mb-10 flex flex-col gap-3 animate-fade-up">
+          <Breadcrumb items={[
+            { label: 'בית', to: '/', icon: <Home className="h-3.5 w-3.5" /> },
+            { label: formattedCategoryName },
+          ]} />
+          <div className="flex flex-row justify-between items-center gap-4">
+          <h1 className="font-fredoka text-4xl text-choco flex items-center gap-3">
+            {category?.icon && (
+              <span className={`inline-flex p-2 rounded-xl ${category.color || 'bg-pastelYellow'}`} aria-hidden="true">
+                <DynamicIcon name={category.icon} className="w-7 h-7 text-choco" strokeWidth={2} />
+              </span>
+            )}
+            {formattedCategoryName}
+          </h1>
           {isAuthenticated && (
-             <>
-                {/* Desktop Add Recipe Button */}
-                <Button asChild className="hidden sm:inline-flex">
-                    <Link to={`/new-recipe?categoryId=${category.id}`}>
-                      <Plus className="ml-2 h-4 w-4" />
-                      הוסף מתכון
-                    </Link>
-                </Button>
-                {/* Mobile Add Recipe Button */}
-                <Button asChild size="icon" className="sm:hidden">
-                    <Link to={`/new-recipe?categoryId=${category.id}`} aria-label="הוסף מתכון">
-                      <Plus className="h-4 w-4" />
-                    </Link>
-                </Button>
-             </>
+            <Button asChild className="shrink-0">
+              <Link to={`/new-recipe?categoryId=${category.id}`} aria-label="הוסף מתכון">
+                <Plus className="h-4 w-4 sm:ml-2" />
+                <span className="hidden sm:inline">הוסף מתכון</span>
+              </Link>
+            </Button>
           )}
+          </div>
+        </header>
 
-          {/* Desktop Back Button */}
-          <Button asChild variant="outline" className="text-choco border-choco hover:bg-choco/10 hidden sm:inline-flex">
-            <Link to="/">
-              <ArrowRight className="ml-2 h-4 w-4" />
-              חזרה לדף הבית
-            </Link>
-          </Button>
-
-          {/* Mobile Back Button */}
-          <Button asChild variant="outline" size="icon" className="text-choco border-choco hover:bg-choco/10 sm:hidden">
-            <Link to="/" aria-label="חזרה לדף הבית">
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-      </header>
-      <main className="w-full max-w-4xl relative z-10">
+        <main className="w-full max-w-4xl relative z-10">
         {recipesForCategory.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recipesForCategory.map((recipe: Recipe, index: number) => (
-              <TransitionLink
-                to={`/recipe/${recipe.id}`}
-                className="group block animate-fade-up"
-                style={{ animationDelay: `${index * 80}ms` }}
-              >
-                <Card
-                  className="flex flex-col overflow-hidden shadow-lg card-lift ring-1 ring-white/80 h-full cursor-pointer"
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.78)',
-                    backdropFilter: 'blur(12px)',
-                    WebkitBackdropFilter: 'blur(12px)',
-                  }}
-                >
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={recipe.image_url || `https://via.placeholder.com/400x200/f0e0d0/a08070?text=${encodeURIComponent(recipe.name)}`}
-                      alt={recipe.name}
-                      className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
-                      style={{ borderRadius: '1.25rem 1.25rem 0 0', viewTransitionName: `recipe-hero-${recipe.id}` } as React.CSSProperties}
-                    />
-                  </div>
-                  <CardHeader className="flex-1">
-                    <CardTitle className="font-fredoka text-xl text-choco transition-transform duration-300 group-hover:-translate-y-0.5">{recipe.name}</CardTitle>
-                    {recipe.description && (
-                      <CardDescription className="text-choco/75 line-clamp-2">
-                        {recipe.description}
-                      </CardDescription>
-                    )}
-                  </CardHeader>
-                  <CardContent className="pt-0 pb-4">
-                    <div className="flex items-center justify-end gap-1 text-choco/35 group-hover:text-choco/65 transition-colors duration-300 text-sm font-fredoka">
-                      <span>לצפייה במתכון</span>
-                      <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-x-1" />
-                    </div>
-                  </CardContent>
-                </Card>
-              </TransitionLink>
+              <RecipeCard key={recipe.id} recipe={recipe} index={index} />
             ))}
           </div>
         ) : (
-          <div className="text-center py-10">
-            <BookOpen className="mx-auto h-16 w-16 text-choco/50 mb-4" />
-            <p className="text-choco/80 text-lg">
-              אוי, עוד אין מתכונים בקטגוריה זו.
-            </p>
-            <p className="text-choco/60 text-md">בקרוב נוסיף לכאן עוד המון מתכונים טעימים!</p>
+          <div className="text-center py-16">
+            <p className="text-5xl mb-4">🥐</p>
+            <p className="font-fredoka text-2xl text-choco mb-2">עדיין אין מתכונים כאן</p>
+            <p className="text-choco/60 leading-relaxed">מיקה עובדת על זה! בקרוב יגיעו מתכונים מדהימים לקטגוריה הזו.</p>
           </div>
         )}
-      </main>
+        </main>
+      </div>
     </div>
   );
 };

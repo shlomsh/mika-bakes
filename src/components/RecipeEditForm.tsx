@@ -5,6 +5,7 @@ import { useMutation } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Loader2, Save, X } from 'lucide-react';
+import AppHeader from '@/components/AppHeader';
 import { useToast } from '@/hooks/use-toast';
 import { recipeEditSchema, RecipeEditFormValues } from '@/schemas/recipeEditSchema';
 import { updateRecipeInDb } from '@/api/recipeApi';
@@ -76,8 +77,10 @@ const RecipeEditForm: React.FC<RecipeEditFormProps> = ({ recipe, onCancel, onSav
   };
 
   return (
-    <div className="min-h-screen w-full flex flex-col items-center p-4 md:p-8" style={{ background: "#faf9f7", direction: "rtl" }}>
-      <main className="w-full max-w-5xl">
+    <div className="min-h-screen w-full flex flex-col bg-gradient-mesh" style={{ direction: "rtl" }}>
+      <AppHeader />
+      <main className="flex flex-col items-center px-4 md:px-8 py-8 w-full flex-1 relative z-10">
+      <div className="w-full max-w-5xl">
         <FormProvider {...form}>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -146,29 +149,20 @@ const RecipeEditForm: React.FC<RecipeEditFormProps> = ({ recipe, onCancel, onSav
               <SauceSection />
               <GarnishSection />
 
-              <div className="flex justify-end gap-2 sm:gap-4">
-                {/* Desktop Cancel Button */}
-                <Button type="button" variant="ghost" onClick={onCancel} className="hidden sm:inline-flex">
-                  ביטול
+              <div className="flex justify-end gap-3">
+                <Button type="button" variant="ghost" onClick={onCancel} aria-label="ביטול">
+                  <X className="h-5 w-5 sm:ml-2" />
+                  <span className="hidden sm:inline">ביטול</span>
                 </Button>
-                {/* Mobile Cancel Button */}
-                <Button type="button" variant="ghost" size="icon" onClick={onCancel} className="sm:hidden" aria-label="ביטול">
-                  <X className="h-5 w-5" />
-                </Button>
-
-                {/* Desktop Save Button */}
-                <Button type="submit" disabled={mutation.isPending} className="hidden sm:inline-flex">
-                  {mutation.isPending ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <Save className="ml-2 h-4 w-4" />}
-                  שמור שינויים
-                </Button>
-                {/* Mobile Save Button */}
-                <Button type="submit" size="icon" disabled={mutation.isPending} className="sm:hidden" aria-label="שמור שינויים">
-                  {mutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                <Button type="submit" disabled={mutation.isPending} aria-label="שמור שינויים">
+                  {mutation.isPending ? <Loader2 className="h-4 w-4 sm:ml-2 animate-spin" /> : <Save className="h-4 w-4 sm:ml-2" />}
+                  <span className="hidden sm:inline">שמור שינויים</span>
                 </Button>
               </div>
             </form>
           </Form>
         </FormProvider>
+        </div>
       </main>
     </div>
   );

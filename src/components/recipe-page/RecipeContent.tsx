@@ -6,16 +6,16 @@ interface RecipeContentProps {
   recipe: RecipeWithDetails;
 }
 
-const IngredientChecklist: React.FC<{ ingredients: { description: string }[]; accentColor: string }> = ({ ingredients, accentColor }) => (
-  <div className="rounded-2xl overflow-hidden border border-choco/5">
+const IngredientChecklist: React.FC<{ ingredients: { description: string }[]; rowAccent: string }> = ({ ingredients, rowAccent }) => (
+  <div className="rounded-xl overflow-hidden">
     {ingredients.map((ingredient, index) => (
       <div
         key={index}
-        className={`flex items-center gap-3 px-4 py-2.5 animate-fade-up ${index % 2 === 0 ? accentColor : 'bg-white'}`}
+        className={`flex items-center gap-3 px-4 py-2.5 animate-fade-up ${index % 2 === 0 ? rowAccent : ''}`}
         style={{ animationDelay: `${index * 35}ms` }}
       >
-        <span className="w-2 h-2 rounded-full bg-choco/30 shrink-0" />
-        <span className="font-frankRuhl text-choco/90 leading-snug">{ingredient.description}</span>
+        <span className="w-2 h-2 rounded-full bg-choco/40 shrink-0 mt-1.5" />
+        <span className="text-choco/90 leading-snug">{ingredient.description}</span>
       </div>
     ))}
   </div>
@@ -30,11 +30,11 @@ const StepList: React.FC<{ steps: { step_number: number; description: string }[]
         </div>
         {useHtml ? (
           <div
-            className="flex-1 pt-1 leading-relaxed text-choco/90 font-frankRuhl"
+            className="flex-1 pt-1 leading-relaxed text-choco/90"
             dangerouslySetInnerHTML={{ __html: step.description }}
           />
         ) : (
-          <p className="flex-1 pt-1 leading-relaxed text-choco/90 font-frankRuhl">
+          <p className="flex-1 pt-1 leading-relaxed text-choco/90">
             {step.description}
           </p>
         )}
@@ -46,10 +46,10 @@ const StepList: React.FC<{ steps: { step_number: number; description: string }[]
 const RecipeContent: React.FC<RecipeContentProps> = ({ recipe }) => {
   return (
     <div className="animate-fade-up">
-      {/* Full-bleed hero image with overlay */}
+      {/* Full-bleed hero image */}
       <div className="relative rounded-3xl overflow-hidden shadow-xl mb-8">
         <img
-          src={recipe.image_url || `https://via.placeholder.com/600x400/f0e0d0/a08070?text=${encodeURIComponent(recipe.name)}`}
+          src={recipe.image_url || '/placeholder.svg'}
           alt={recipe.name}
           className="w-full h-72 md:h-96 object-cover"
           style={{ borderRadius: 0, viewTransitionName: `recipe-hero-${recipe.id}` } as React.CSSProperties}
@@ -57,63 +57,62 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-choco/60 via-choco/10 to-transparent" />
         {recipe.description && (
           <div className="absolute bottom-0 right-0 left-0 p-6 md:p-8">
-            <p className="text-white/90 text-lg md:text-xl font-frankRuhl max-w-2xl leading-relaxed drop-shadow-lg">
+            <p className="text-white/90 text-lg md:text-xl max-w-2xl leading-relaxed drop-shadow-lg">
               {recipe.description}
             </p>
           </div>
         )}
       </div>
 
-      {/* Ingredients section */}
+      {/* Ingredients — apricot tint */}
       {recipe.recipe_ingredients && recipe.recipe_ingredients.length > 0 && (
-        <section className="bg-white rounded-3xl shadow-lg p-6 md:p-8 mb-4 animate-fade-up delay-100">
-          <h2 className="font-fredoka text-xl text-choco mb-4 flex items-center">
-            <ListChecks className="ml-2 text-pastelOrange hover-wobble" />
-            מצרכים:
+        <section className="bg-pastelYellow/25 rounded-3xl p-6 md:p-8 mb-4 animate-fade-up delay-100">
+          <h2 className="font-fredoka text-2xl text-choco mb-4 flex items-center gap-2">
+            <ListChecks className="h-5 w-5 text-choco/50 shrink-0" />
+            מצרכים
           </h2>
-          <IngredientChecklist ingredients={recipe.recipe_ingredients} accentColor="bg-pastelYellow/20" />
+          <IngredientChecklist ingredients={recipe.recipe_ingredients} rowAccent="bg-white/50" />
         </section>
       )}
 
-      {/* Wavy divider */}
       <div className="divider-wavy my-2" />
 
-      {/* Instructions section */}
+      {/* Instructions — clean off-white for maximum readability */}
       {recipe.recipe_instructions && recipe.recipe_instructions.length > 0 && (
-        <section className="bg-white rounded-3xl shadow-lg p-6 md:p-8 mb-4 animate-fade-up delay-200">
-          <h2 className="font-fredoka text-xl text-choco mb-6 flex items-center">
-            <Utensils className="ml-2 text-pastelBlue hover-wobble" />
-            אופן ההכנה:
+        <section className="bg-off-white rounded-3xl p-6 md:p-8 mb-4 animate-fade-up delay-200">
+          <h2 className="font-fredoka text-2xl text-choco mb-6 flex items-center gap-2">
+            <Utensils className="h-5 w-5 text-choco/50 shrink-0" />
+            אופן ההכנה
           </h2>
           <StepList steps={recipe.recipe_instructions} accentBg="bg-pastelBlue" useHtml />
         </section>
       )}
 
-      {/* Sauce section */}
+      {/* Sauce — peach-orange tint */}
       {(recipe.recipe_sauces && recipe.recipe_sauces.length > 0 || (recipe.recipe_sauce_ingredients && recipe.recipe_sauce_ingredients.length > 0)) && (
         <>
           <div className="divider-wavy my-2" />
-          <section className="bg-white rounded-3xl shadow-lg p-6 md:p-8 mb-4 animate-fade-up delay-300">
-            <h2 className="font-fredoka text-xl text-choco mb-4 flex items-center">
-              <Soup className="ml-2 text-pastelOrange hover-wobble" />
-              רוטב:
+          <section className="bg-pastelOrange/25 rounded-3xl p-6 md:p-8 mb-4 animate-fade-up delay-300">
+            <h2 className="font-fredoka text-2xl text-choco mb-4 flex items-center gap-2">
+              <Soup className="h-5 w-5 text-choco/50 shrink-0" />
+              רוטב
             </h2>
 
             {recipe.recipe_sauce_ingredients && recipe.recipe_sauce_ingredients.length > 0 && (
               <div className="mb-6">
-                <h3 className="font-fredoka text-lg text-choco mb-3 flex items-center">
-                  <ListChecks className="ml-2 text-pastelOrange" />
-                  מצרכים לרוטב:
+                <h3 className="font-fredoka text-lg text-choco mb-3 flex items-center gap-2">
+                  <ListChecks className="h-4 w-4 text-choco/50 shrink-0" />
+                  מצרכים
                 </h3>
-                <IngredientChecklist ingredients={recipe.recipe_sauce_ingredients} accentColor="bg-pastelOrange/20" />
+                <IngredientChecklist ingredients={recipe.recipe_sauce_ingredients} rowAccent="bg-white/50" />
               </div>
             )}
 
             {recipe.recipe_sauces && recipe.recipe_sauces.length > 0 && (
               <div>
-                <h3 className="font-fredoka text-lg text-choco mb-4 flex items-center">
-                  <Utensils className="ml-2 text-pastelOrange" />
-                  אופן הכנת הרוטב:
+                <h3 className="font-fredoka text-lg text-choco mb-4 flex items-center gap-2">
+                  <Utensils className="h-4 w-4 text-choco/50 shrink-0" />
+                  הכנה
                 </h3>
                 <StepList steps={recipe.recipe_sauces} accentBg="bg-pastelOrange" />
               </div>
@@ -122,33 +121,33 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe }) => {
         </>
       )}
 
-      {/* Garnish section */}
+      {/* Garnish — mint green tint */}
       {(recipe.recipe_garnish_instructions && recipe.recipe_garnish_instructions.length > 0 || (recipe.recipe_garnish_ingredients && recipe.recipe_garnish_ingredients.length > 0)) && (
         <>
           <div className="divider-wavy my-2" />
-          <section className="bg-white rounded-3xl shadow-lg p-6 md:p-8 mb-4 animate-fade-up delay-400">
-            <h2 className="font-fredoka text-xl text-choco mb-4 flex items-center">
-              <Sparkles className="ml-2 text-pastelYellow hover-wobble" />
-              תוספת:
+          <section className="bg-pastelGreen/25 rounded-3xl p-6 md:p-8 mb-4 animate-fade-up delay-400">
+            <h2 className="font-fredoka text-2xl text-choco mb-4 flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-choco/50 shrink-0" />
+              תוספת
             </h2>
 
             {recipe.recipe_garnish_ingredients && recipe.recipe_garnish_ingredients.length > 0 && (
               <div className="mb-6">
-                <h3 className="font-fredoka text-lg text-choco mb-3 flex items-center">
-                  <ListChecks className="ml-2 text-pastelYellow" />
-                  מצרכים לתוספת:
+                <h3 className="font-fredoka text-lg text-choco mb-3 flex items-center gap-2">
+                  <ListChecks className="h-4 w-4 text-choco/50 shrink-0" />
+                  מצרכים
                 </h3>
-                <IngredientChecklist ingredients={recipe.recipe_garnish_ingredients} accentColor="bg-pastelYellow/20" />
+                <IngredientChecklist ingredients={recipe.recipe_garnish_ingredients} rowAccent="bg-white/50" />
               </div>
             )}
 
             {recipe.recipe_garnish_instructions && recipe.recipe_garnish_instructions.length > 0 && (
               <div>
-                <h3 className="font-fredoka text-lg text-choco mb-4 flex items-center">
-                  <Utensils className="ml-2 text-pastelYellow" />
-                  אופן הכנת התוספת:
+                <h3 className="font-fredoka text-lg text-choco mb-4 flex items-center gap-2">
+                  <Utensils className="h-4 w-4 text-choco/50 shrink-0" />
+                  הכנה
                 </h3>
-                <StepList steps={recipe.recipe_garnish_instructions} accentBg="bg-pastelYellow" />
+                <StepList steps={recipe.recipe_garnish_instructions} accentBg="bg-pastelGreen" />
               </div>
             )}
           </section>

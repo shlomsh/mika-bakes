@@ -28,19 +28,18 @@ const MikaHero: React.FC = () => (
 
     {/* Text section */}
     <div className="flex-1 flex flex-col items-start justify-center text-right">
-      <span className="bg-white/80 text-choco font-fredoka text-xl px-4 py-1 rounded-full shadow mb-2 font-bold animate-fade-up delay-100">
+      <span className="bg-white text-choco font-fredoka text-sm px-3 py-1 rounded-full mb-3 font-bold animate-fade-up delay-100 tracking-wide">
         הכירו את מיקה!
       </span>
       <span
-        className="text-choco text-[2.7rem] font-fredoka font-extrabold leading-tight mb-6 animate-fade-up delay-200"
-        style={{ textShadow: '0 2px 0 #fff9ea' }}
+        className="text-choco text-4xl md:text-5xl font-fredoka font-extrabold leading-tight mb-5 animate-fade-up delay-200"
+        style={{ textShadow: '0 2px 0 rgba(255,255,255,0.5)' }}
       >
-        מיקה - שפית <span className="text-orange-500">צעירה</span> בת 14
+        מיקה - <span className="text-coral">נערה</span> שפית
       </span>
-      <p className="mt-2 text-lg text-choco max-w-lg font-inter animate-fade-up delay-300">
-        מיקה היא בת ה-14 של המשפחה וכבר אלופה גדולה במטבח! האהבה הכי גדולה שלה היא{' '}
-        <span className="font-bold text-orange-500">קונדיטוריה</span> ו-
-        <span className="font-bold text-orange-500">מאפים</span>. כאן תמצאו את כל המתכונים הכי שווים שלה – מתוקים, מלוחים וביתיים.
+      <p className="mt-2 text-lg text-choco max-w-lg animate-fade-up delay-300 leading-relaxed">
+        מיקה היא הנערה של המשפחה וכבר אלופה גדולה במטבח! האהבה הכי גדולה שלה היא{' '}
+        <span className="font-bold">קונדיטוריה</span> ו<span className="font-bold">מאפים</span>. כאן תמצאו את כל המתכונים הכי שווים שלה, מתוקים, מלוחים וביתיים.
       </p>
     </div>
   </section>

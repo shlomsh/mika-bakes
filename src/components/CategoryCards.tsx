@@ -42,7 +42,7 @@ const CategoryCards: React.FC<CategoryCardsProps> = ({ categories, onEdit }) => 
             </div>
           </TransitionLink>
           {isAuthenticated && (
-            <div className="absolute top-2 left-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="absolute top-2 left-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
               <DropdownMenu dir="rtl">
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="h-8 w-8 p-0 rounded-full bg-white/50 hover:bg-white/80">

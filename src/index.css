@@ -4,7 +4,7 @@
 
 /* Add Fredoka and Inter font to base */
 body {
-  @apply font-inter bg-off-white rtl:text-right;
+  @apply font-frankRuhl bg-off-white rtl:text-right;
 }
 h1, h2, h3, .font-fredoka {
   font-family: 'Fredoka', ui-rounded, sans-serif;
@@ -18,7 +18,7 @@ img {
 
 /* ─── Selection color ─── */
 ::selection {
-  background-color: #fecaca;
+  background-color: #ffd4a8;
   color: #614e3e;
 }
 
@@ -229,9 +229,9 @@ img {
 .skeleton {
   background: linear-gradient(
     90deg,
-    #ede0d8 25%,
-    #f7ede6 50%,
-    #ede0d8 75%
+    #edd8bc 25%,
+    #f7e8d4 50%,
+    #edd8bc 75%
   );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
@@ -273,10 +273,10 @@ img {
 .bg-gradient-mesh {
   background-color: #fdf2f0;
   background-image:
-    radial-gradient(ellipse 80% 70% at 10% 15%, rgba(254, 180, 170, 0.55) 0%, transparent 65%),
-    radial-gradient(ellipse 70% 80% at 90% 80%, rgba(248, 180, 210, 0.50) 0%, transparent 65%),
-    radial-gradient(ellipse 60% 55% at 50% 5%, rgba(254, 190, 195, 0.45) 0%, transparent 60%),
-    radial-gradient(ellipse 55% 65% at 75% 20%, rgba(235, 155, 240, 0.30) 0%, transparent 55%),
+    radial-gradient(ellipse 80% 70% at 10% 15%, rgba(255, 212, 168, 0.45) 0%, transparent 65%),
+    radial-gradient(ellipse 70% 80% at 90% 80%, rgba(186, 230, 253, 0.45) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 55% at 50% 5%,  rgba(254, 180, 138, 0.38) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 65% at 75% 20%, rgba(187, 247, 208, 0.32) 0%, transparent 55%),
     radial-gradient(ellipse 50% 50% at 30% 70%, rgba(254, 215, 170, 0.35) 0%, transparent 60%);
   position: relative;
 }
@@ -287,13 +287,14 @@ img {
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
+  will-change: transform;
 }
 .bg-gradient-mesh::before {
   width: 500px;
   height: 500px;
   top: -100px;
   right: -120px;
-  background: radial-gradient(circle, rgba(254, 190, 190, 0.40) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(255, 212, 168, 0.42) 0%, transparent 70%);
   animation: float-gentle 14s ease-in-out infinite;
 }
 .bg-gradient-mesh::after {
@@ -301,7 +302,7 @@ img {
   height: 400px;
   bottom: 10%;
   left: -80px;
-  background: radial-gradient(circle, rgba(248, 180, 220, 0.35) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(186, 230, 253, 0.38) 0%, transparent 70%);
   animation: float-gentle-reverse 16s ease-in-out infinite;
 }
 
@@ -309,8 +310,8 @@ img {
 .bg-floating-shapes {
   background-color: #fdf2f0;
   background-image:
-    radial-gradient(ellipse 70% 60% at 20% 30%, rgba(254, 190, 180, 0.45) 0%, transparent 65%),
-    radial-gradient(ellipse 60% 70% at 80% 70%, rgba(248, 175, 210, 0.40) 0%, transparent 65%);
+    radial-gradient(ellipse 70% 60% at 20% 30%, rgba(187, 247, 208, 0.42) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 70% at 80% 70%, rgba(186, 230, 253, 0.40) 0%, transparent 65%);
   position: relative;
   overflow: hidden;
 }
@@ -327,7 +328,7 @@ img {
   height: 500px;
   top: -80px;
   left: -100px;
-  background: radial-gradient(circle, rgba(254, 190, 190, 0.45) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(255, 212, 168, 0.42) 0%, transparent 65%);
   animation: float-gentle 12s ease-in-out infinite;
 }
 .bg-floating-shapes::after {
@@ -335,7 +336,7 @@ img {
   height: 420px;
   bottom: 5%;
   right: -60px;
-  background: radial-gradient(circle, rgba(248, 180, 220, 0.40) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(187, 247, 208, 0.38) 0%, transparent 65%);
   animation: float-gentle-reverse 14s ease-in-out infinite;
 }
 /* Extra blob via utility span */
@@ -346,8 +347,49 @@ img {
   top: 35%;
   left: 50%;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(254, 200, 180, 0.30) 0%, transparent 65%);
+  background: radial-gradient(circle, rgba(255, 212, 168, 0.28) 0%, transparent 65%);
   pointer-events: none;
   z-index: 0;
   animation: float-gentle 16s ease-in-out infinite;
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .animate-fade-in,
+  .animate-slide-in-right,
+  .animate-slide-in-left,
+  .animate-scale-in {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+  .animate-float,
+  .animate-float-reverse {
+    animation: none;
+  }
+  .skeleton {
+    animation: none;
+    background: #edd8bc;
+  }
+  .card-lift,
+  .card-lift-flat {
+    transition: none;
+  }
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* ─── Touch devices: disable sticky hover ─── */
+@media (hover: none) {
+  .card-lift:hover,
+  .card-lift-flat:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  .hover-wobble:hover {
+    animation: none;
+  }
 }
