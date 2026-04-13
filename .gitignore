@@ -25,3 +25,6 @@ dist-ssr
 .vercel
 .env
 .env*.local
+
+# Installed agent skills (reinstall as needed)
+.agents/skills
