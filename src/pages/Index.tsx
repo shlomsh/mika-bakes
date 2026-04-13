@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import * as z from 'zod';
 
@@ -25,12 +24,8 @@ type CategoryFormValues = z.infer<typeof categoryFormSchema>;
 
 const Index = () => {
   const { toast } = useToast();
-  
-  const { 
-    categories, 
-    isLoadingCategories, 
-    updateCategory, 
-  } = useCategories();
+
+  const { categories, isLoadingCategories, updateCategory } = useCategories();
 
   const [isFormOpen, setFormOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
@@ -47,7 +42,7 @@ const Index = () => {
           toast({ title: "הצלחה!", description: "הקטגוריה עודכנה בהצלחה." });
           setFormOpen(false);
           setEditingCategory(null);
-        }
+        },
       });
     }
   };
@@ -61,57 +56,56 @@ const Index = () => {
       >
         <AppHeader categories={categories} />
 
-        {/* Main 2-column desktop grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 px-8 py-14 max-w-7xl mx-auto w-full flex-1 transition-all">
-          {/* Main Hero & Picks (2 columns on desktop) */}
-          <div className="lg:col-span-2 flex flex-col gap-10">
-            <MikaHero />
-            
-            {/* On mobile, categories appear here */}
-            <div className="block lg:hidden">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="font-fredoka text-2xl text-choco">קטגוריות</h2>
-              </div>
-              {isLoadingCategories ? <div className="flex flex-col gap-4">{[0,1,2,3].map(i => <CategoryCardSkeleton key={i} />)}</div> :
-                <CategoryCards 
-                  categories={categories || []}
-                  onEdit={handleEdit}
-                />
-              }
-            </div>
+        <div className="w-full max-w-5xl mx-auto px-6 md:px-10 pb-20 flex-1 relative z-10">
+          {/* Opening hero */}
+          <MikaHero />
 
+          {/* Divider */}
+          <div className="divider-wavy my-10" />
+
+          {/* Categories */}
+          <section>
+            <h2 className="font-fredoka text-2xl text-choco mb-5">גלו לפי קטגוריה</h2>
+            {isLoadingCategories ? (
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                {[0, 1, 2].map((i) => (
+                  <CategoryCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : (
+              <CategoryCards categories={categories || []} onEdit={handleEdit} />
+            )}
+          </section>
+
+          {/* Picks */}
+          <div className="mt-14">
             <RecipePicks />
           </div>
-          {/* Categories Section on Desktop */}
-          <div className="hidden lg:block">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="font-fredoka text-2xl text-choco">קטגוריות</h2>
-            </div>
-            {isLoadingCategories ? <div className="flex flex-col gap-4">{[0,1,2,3].map(i => <CategoryCardSkeleton key={i} />)}</div> :
-              <CategoryCards 
-                categories={categories || []}
-                onEdit={handleEdit}
-              />
-            }
-          </div>
         </div>
-        
-        <Dialog open={isFormOpen} onOpenChange={(isOpen) => { if (!isOpen) setEditingCategory(null); setFormOpen(isOpen); }}>
-          <DialogContent style={{ direction: 'rtl' }}>
+
+        <Dialog
+          open={isFormOpen}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) setEditingCategory(null);
+            setFormOpen(isOpen);
+          }}
+        >
+          <DialogContent style={{ direction: "rtl" }}>
             <DialogHeader>
               <DialogTitle>עריכת קטגוריה</DialogTitle>
               <DialogDescription>
-                {editingCategory ? `ערוך את פרטי הקטגוריה "${editingCategory.name}".` : ''}
+                {editingCategory
+                  ? `ערוך את פרטי הקטגוריה "${editingCategory.name}".`
+                  : ""}
               </DialogDescription>
             </DialogHeader>
-            <CategoryForm 
+            <CategoryForm
               category={editingCategory}
               onSubmit={handleFormSubmit}
               isSubmitting={updateCategory.isPending}
             />
           </DialogContent>
         </Dialog>
-        
       </main>
     </>
   );

@@ -12,52 +12,86 @@ type RecipePick = {
 };
 
 const fetchRecommendedRecipes = async (): Promise<RecipePick[]> => {
-  return apiFetch<RecipePick[]>('/api/recipes/recommended');
+  return apiFetch<RecipePick[]>("/api/recipes/recommended");
 };
 
 const RecipePicks: React.FC = () => {
   const { data: recipes, isLoading, isError } = useQuery({
-    queryKey: ['recommendedRecipes'],
+    queryKey: ["recommendedRecipes"],
     queryFn: fetchRecommendedRecipes,
   });
 
-  if (isLoading) {
-    return <RecipePicksSkeleton />;
-  }
+  if (isLoading) return <RecipePicksSkeleton />;
+
+  if (isError || !recipes || recipes.length === 0) return null;
+
+  const [featured, ...rest] = recipes;
 
   return (
-    <section
-      className="rounded-3xl p-7 mt-8 animate-fade-up delay-200 bg-pastelOrange/20 ring-1 ring-choco/5"
-      dir="rtl"
-    >
-      <h2 className="font-fredoka text-2xl mb-4 text-choco flex items-center gap-2">
-        <span className="text-xl" aria-hidden="true">💛</span>
+    <section dir="rtl" className="animate-fade-up delay-200">
+      <h2 className="font-fredoka text-2xl text-choco mb-5 flex items-center gap-2">
+        <span aria-hidden="true">💛</span>
         הכי אהובים של מיקה
       </h2>
-      {isError || !recipes || recipes.length === 0 ? (
-        <p className="text-choco/80">לא נמצאו מתכונים מומלצים כרגע.</p>
-      ) : (
-        <div className="flex flex-col gap-4">
-          {recipes.map((recipe, index) => (
-            <div key={recipe.id} className="animate-fade-up" style={{ animationDelay: `${300 + index * 80}ms` }}>
+
+      {/* Featured pick — full-width tall card */}
+      <TransitionLink
+        to={`/recipe/${featured.id}`}
+        className="group block mb-4 animate-fade-up"
+      >
+        <div className="relative rounded-2xl overflow-hidden h-60 md:h-80 card-lift">
+          <img
+            src={featured.image_url || "/placeholder.svg"}
+            alt={featured.name}
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 group-active:scale-105"
+            style={
+              {
+                viewTransitionName: `recipe-hero-${featured.id}`,
+              } as React.CSSProperties
+            }
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-choco/70 via-choco/15 to-transparent" />
+          <div className="absolute bottom-0 right-0 left-0 p-5">
+            <p className="font-fredoka text-2xl text-white leading-snug">
+              {featured.name}
+            </p>
+            {featured.description && (
+              <p className="text-white/75 text-sm mt-1 line-clamp-2 font-frankRuhl">
+                {featured.description}
+              </p>
+            )}
+          </div>
+        </div>
+      </TransitionLink>
+
+      {/* Remaining picks — 2-col grid */}
+      {rest.length > 0 && (
+        <div className="grid grid-cols-2 gap-3">
+          {rest.map((recipe, index) => (
             <TransitionLink
+              key={recipe.id}
               to={`/recipe/${recipe.id}`}
-              className="group flex items-center gap-4 p-3 rounded-xl bg-white/60 card-lift-flat no-underline"
+              className="group block animate-fade-up"
+              style={{ animationDelay: `${400 + index * 80}ms` }}
             >
-              <img
-                src={recipe.image_url || '/placeholder.svg'}
-                alt={recipe.name}
-                className="w-16 h-16 object-cover rounded-xl border-2 border-white shadow-sm transition-transform duration-300 group-hover:scale-105"
-                style={{ viewTransitionName: `recipe-hero-${recipe.id}` } as React.CSSProperties}
-              />
-              <div className="flex-1">
-                <div className="font-fredoka text-lg text-choco transition-transform duration-300 group-hover:-translate-y-0.5">
-                  {recipe.name}
+              <div className="bg-off-white rounded-2xl overflow-hidden card-lift h-full flex flex-col">
+                <img
+                  src={recipe.image_url || "/placeholder.svg"}
+                  alt={recipe.name}
+                  className="w-full h-32 object-cover transition-transform duration-500 group-hover:scale-105 group-active:scale-105"
+                  style={
+                    {
+                      viewTransitionName: `recipe-hero-${recipe.id}`,
+                    } as React.CSSProperties
+                  }
+                />
+                <div className="p-3 flex-1">
+                  <p className="font-fredoka text-base text-choco leading-snug group-hover:text-coral group-active:text-coral transition-colors duration-200">
+                    {recipe.name}
+                  </p>
                 </div>
-                <div className="text-choco/80 text-sm">{recipe.description}</div>
               </div>
             </TransitionLink>
-            </div>
           ))}
         </div>
       )}

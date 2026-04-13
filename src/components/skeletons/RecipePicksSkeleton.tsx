@@ -1,15 +1,17 @@
 import React from 'react';
 
 const RecipePicksSkeleton: React.FC = () => (
-  <section className="bg-white rounded-3xl shadow-lg p-7 mt-8" dir="rtl">
-    <div className="skeleton h-7 w-32 mb-4" />
-    <div className="flex flex-col gap-4">
-      {[0, 1, 2].map((i) => (
-        <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-pastelYellow/10">
-          <div className="skeleton w-16 h-16 rounded-xl shrink-0" />
-          <div className="flex-1 flex flex-col gap-2">
-            <div className="skeleton h-5 w-2/3" />
-            <div className="skeleton h-3 w-4/5" />
+  <section dir="rtl" className="animate-fade-up delay-200">
+    <div className="skeleton h-7 w-48 mb-5 rounded" />
+    {/* featured */}
+    <div className="skeleton w-full h-60 md:h-80 rounded-2xl mb-4" />
+    {/* 2-col grid */}
+    <div className="grid grid-cols-2 gap-3">
+      {[0, 1].map((i) => (
+        <div key={i} className="rounded-2xl overflow-hidden bg-off-white">
+          <div className="skeleton w-full h-32" />
+          <div className="p-3">
+            <div className="skeleton h-5 w-3/4 rounded" />
           </div>
         </div>
       ))}

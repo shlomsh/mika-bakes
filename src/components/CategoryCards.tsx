@@ -1,4 +1,3 @@
-
 import React from "react";
 import TransitionLink from "@/components/TransitionLink";
 import DynamicIcon from "./DynamicIcon";
@@ -22,31 +21,43 @@ const CategoryCards: React.FC<CategoryCardsProps> = ({ categories, onEdit }) => 
   const { isAuthenticated } = useAuth();
 
   return (
-    <aside className="flex flex-col gap-4 w-full" dir="rtl">
+    <div
+      className="grid grid-cols-2 lg:grid-cols-3 gap-3 w-full"
+      dir="rtl"
+    >
       {categories.map((cat, index) => (
-        <div key={cat.id} className="relative group animate-fade-up" style={{ animationDelay: `${index * 60}ms` }}>
-          <TransitionLink to={`/category/${cat.slug}`} className="no-underline">
+        <div
+          key={cat.id}
+          className="relative group animate-fade-up"
+          style={{ animationDelay: `${index * 70}ms` }}
+        >
+          <TransitionLink to={`/category/${cat.slug}`} className="no-underline block h-full">
             <div
-              className={`rounded-2xl shadow-lg p-4 flex items-center gap-4 ${cat.color || 'bg-gray-200'} relative card-lift cursor-pointer texture-noise ring-1 ring-white/60`}
-              dir="rtl"
+              className={`rounded-2xl p-5 flex flex-col items-center justify-center text-center gap-2.5 h-32 card-lift cursor-pointer texture-noise ring-1 ring-white/60 ${cat.color || "bg-pastelYellow"}`}
             >
               {cat.icon && (
-                <div className="bg-white/30 rounded-xl p-1.5 shrink-0 transition-transform duration-300 group-hover:scale-105">
-                  <DynamicIcon name={cat.icon} className="w-10 h-10 text-choco opacity-85" strokeWidth={2} />
-                </div>
+                <DynamicIcon
+                  name={cat.icon}
+                  className="w-9 h-9 text-choco/80 shrink-0"
+                  strokeWidth={2}
+                />
               )}
-              <div className="flex-grow">
-                <span className="font-fredoka text-xl text-choco tracking-wide transition-transform duration-300 group-hover:-translate-y-0.5 inline-block">{cat.name}</span>
-                {cat.description && <p className="mt-1 text-choco/75 text-sm leading-tight">{cat.description}</p>}
-              </div>
+              <span className="font-fredoka text-lg text-choco leading-tight">
+                {cat.name}
+              </span>
             </div>
           </TransitionLink>
+
           {isAuthenticated && (
             <div className="absolute top-2 left-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
               <DropdownMenu dir="rtl">
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0 rounded-full bg-white/50 hover:bg-white/80">
-                    <MoreVertical className="h-4 w-4 text-choco" />
+                  <Button
+                    variant="ghost"
+                    className="h-7 w-7 p-0 rounded-full bg-white/60 hover:bg-white/90"
+                    aria-label="אפשרויות"
+                  >
+                    <MoreVertical className="h-3.5 w-3.5 text-choco" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
@@ -60,7 +71,7 @@ const CategoryCards: React.FC<CategoryCardsProps> = ({ categories, onEdit }) => 
           )}
         </div>
       ))}
-    </aside>
+    </div>
   );
 };
 
