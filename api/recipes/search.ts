@@ -20,7 +20,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       WHERE name ILIKE ${'%' + q + '%'}
       LIMIT 10
     `;
-    res.setHeader('Cache-Control', 'public, s-maxage=60, stale-while-revalidate=300');
     return res.status(200).json(rows);
   } catch (err: unknown) {
     console.error('GET /api/recipes/search error:', err);

@@ -25,7 +25,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       WHERE r.category_id = ${category.id}
     `;
 
-    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
     return res.status(200).json({ category, recipes });
   } catch (err: unknown) {
     console.error('GET /api/category/[slug] error:', err);

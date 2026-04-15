@@ -9,7 +9,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const sql = getDb();
     const rows = await sql`SELECT * FROM categories ORDER BY name`;
-    res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
     return res.status(200).json(rows);
   } catch (err: unknown) {
     console.error('GET /api/categories error:', err);

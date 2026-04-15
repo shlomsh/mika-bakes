@@ -59,7 +59,6 @@ async function handleGet(id: string, res: VercelResponse) {
       recipe_garnish_instructions: garnishInstructions,
     };
 
-    res.setHeader('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=86400');
     return res.status(200).json(recipe);
   } catch (err: unknown) {
     console.error('GET /api/recipe/[id] error:', err);
