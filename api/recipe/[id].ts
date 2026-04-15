@@ -1,5 +1,4 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { neon } from '@neondatabase/serverless';
 import { getDb } from '../_db.js';
 import { requireAuth } from '../_auth.js';
 
@@ -75,7 +74,7 @@ async function handlePut(id: string, req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const sql = neon(process.env.DATABASE_URL!);
+    const sql = getDb();
     const {
       name, description, image_url, category_id, recommended,
       ingredients, instructions, sauces, sauce_ingredients,
