@@ -21,25 +21,25 @@
     {
       "source": "/api/categories",
       "headers": [
-        { "key": "Cache-Control", "value": "public, s-maxage=86400, stale-while-revalidate=604800" }
+        { "key": "Cache-Control", "value": "public, s-maxage=300, stale-while-revalidate=86400" }
       ]
     },
     {
       "source": "/api/recipes/recommended",
       "headers": [
-        { "key": "Cache-Control", "value": "public, s-maxage=86400, stale-while-revalidate=604800" }
+        { "key": "Cache-Control", "value": "public, s-maxage=300, stale-while-revalidate=86400" }
       ]
     },
     {
       "source": "/api/category/:slug",
       "headers": [
-        { "key": "Cache-Control", "value": "public, s-maxage=3600, stale-while-revalidate=86400" }
+        { "key": "Cache-Control", "value": "public, s-maxage=300, stale-while-revalidate=86400" }
       ]
     },
     {
       "source": "/api/recipe/:id",
       "headers": [
-        { "key": "Cache-Control", "value": "public, s-maxage=3600, stale-while-revalidate=86400" }
+        { "key": "Cache-Control", "value": "public, s-maxage=300, stale-while-revalidate=86400" }
       ]
     },
     {
