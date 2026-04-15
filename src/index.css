@@ -368,6 +368,14 @@ img {
   .animate-float-reverse {
     animation: none;
   }
+  .bg-gradient-mesh::before,
+  .bg-gradient-mesh::after,
+  .bg-floating-shapes::before,
+  .bg-floating-shapes::after,
+  .bg-blob-extra {
+    animation: none !important;
+    will-change: auto;
+  }
   .skeleton {
     animation: none;
     background: #edd8bc;

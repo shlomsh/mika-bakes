@@ -5,14 +5,23 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import CategoryPage from "./pages/CategoryPage";
-import RecipePage from "./pages/RecipePage";
-import NewRecipePage from "./pages/NewRecipePage";
+import { lazy, Suspense } from "react";
 import PWAReloadPrompt from "./components/PWAReloadPrompt";
 
-const queryClient = new QueryClient();
+const Index = lazy(() => import("./pages/Index"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage"));
+const RecipePage = lazy(() => import("./pages/RecipePage"));
+const NewRecipePage = lazy(() => import("./pages/NewRecipePage"));
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: Infinity,         // recipes rarely change — never refetch within a session
+      gcTime: 1000 * 60 * 30,     // keep unused cache for 30 min
+    },
+  },
+});
 
 const App = () => (
   <HelmetProvider>
@@ -22,13 +31,15 @@ const App = () => (
         <Sonner />
         <PWAReloadPrompt />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/category/:categoryName" element={<CategoryPage />} />
-            <Route path="/recipe/:recipeId" element={<RecipePage />} />
-            <Route path="/new-recipe" element={<NewRecipePage />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <Suspense>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/category/:categoryName" element={<CategoryPage />} />
+              <Route path="/recipe/:recipeId" element={<RecipePage />} />
+              <Route path="/new-recipe" element={<NewRecipePage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </Suspense>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>

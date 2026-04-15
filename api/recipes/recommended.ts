@@ -13,6 +13,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       FROM recipes
       WHERE recommended = true
     `;
+    res.setHeader('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800');
     return res.status(200).json(rows);
   } catch (err: unknown) {
     console.error('GET /api/recipes/recommended error:', err);

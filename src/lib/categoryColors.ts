@@ -10,9 +10,9 @@
 
 const COLOR_REMAP: Record<string, string> = {
   // Active DB categories
-  'bg-rose-200':    'oklch(76% 0.14 5)',    // rose-pink  — desserts
-  'bg-pink-200':    'oklch(78% 0.13 38)',   // peach      — savory pastries
-  'bg-red-200':     'oklch(74% 0.11 320)',  // soft lilac — stews
+  'bg-rose-200':    'oklch(73% 0.18 5)',    // deep rose-pink  — desserts (punchy hero)
+  'bg-pink-200':    'oklch(78% 0.13 38)',   // warm peach      — savory pastries
+  'bg-red-200':     'oklch(74% 0.11 320)',  // soft lilac      — stews
 
   // Extended palette for future categories
   'bg-yellow-200':  'oklch(82% 0.12 55)',

@@ -43,6 +43,7 @@ const RecipePicks: React.FC = () => {
           <img
             src={featured.image_url || "/placeholder.svg"}
             alt={featured.name}
+            loading="eager"
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 group-active:scale-105"
             style={
               {
@@ -78,6 +79,7 @@ const RecipePicks: React.FC = () => {
                 <img
                   src={recipe.image_url || "/placeholder.svg"}
                   alt={recipe.name}
+                  loading="lazy"
                   className="w-full h-32 object-cover transition-transform duration-500 group-hover:scale-105 group-active:scale-105"
                   style={
                     {

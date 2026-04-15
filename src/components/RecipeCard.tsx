@@ -7,18 +7,19 @@ interface RecipeCardProps {
   index?: number;
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, index = 0 }) => (
+const RecipeCard: React.FC<RecipeCardProps> = React.memo(({ recipe, index = 0 }) => (
   <TransitionLink
     to={`/recipe/${recipe.id}`}
     className="group block animate-fade-up"
     style={{ animationDelay: `${index * 80}ms` }}
   >
     <div className="bg-off-white rounded-2xl overflow-hidden card-lift h-full flex flex-col">
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden aspect-[4/3]">
         <img
           src={recipe.image_url || '/placeholder.svg'}
           alt={recipe.name}
-          className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-105"
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           style={{ borderRadius: 0, viewTransitionName: `recipe-hero-${recipe.id}` } as React.CSSProperties}
         />
       </div>
@@ -34,6 +35,6 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, index = 0 }) => (
       </div>
     </div>
   </TransitionLink>
-);
+));
 
 export default RecipeCard;

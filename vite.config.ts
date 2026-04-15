@@ -58,20 +58,21 @@ export default defineConfig({
               },
             },
           },
-          // API routes — network-first with offline fallback
+          // API routes — serve from cache instantly, refresh in background
+          // Mutations (POST/PUT/DELETE) are never cached by the browser so this
+          // only affects GET responses, which is exactly what we want.
           {
             urlPattern: /\/api\/.*/i,
-            handler: "NetworkFirst",
+            handler: "StaleWhileRevalidate",
             options: {
               cacheName: "api-responses",
               expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24,
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days max age in SW cache
               },
               cacheableResponse: {
                 statuses: [0, 200],
               },
-              networkTimeoutSeconds: 5,
             },
           },
         ],
@@ -119,6 +120,30 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Framework core — changes rarely, long-lived cache
+          "vendor-react": ["react", "react-dom"],
+          // Routing + data fetching — changes occasionally
+          "vendor-query": ["@tanstack/react-query", "react-router-dom"],
+          // Auth — large, changes independently of app code
+          "vendor-clerk": ["@clerk/clerk-react"],
+          // Radix UI / shadcn — stable component library
+          "vendor-ui": [
+            "@radix-ui/react-dialog",
+            "@radix-ui/react-dropdown-menu",
+            "@radix-ui/react-tooltip",
+            "@radix-ui/react-popover",
+            "@radix-ui/react-select",
+            "@radix-ui/react-label",
+            "@radix-ui/react-slot",
+          ],
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
