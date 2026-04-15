@@ -11,6 +11,7 @@ import RecipeCard from '@/components/RecipeCard';
 import RecipeCardSkeleton from '@/components/skeletons/RecipeCardSkeleton';
 import AppHeader from '@/components/AppHeader';
 import Breadcrumb from '@/components/Breadcrumb';
+import { getCategoryBgStyle } from '@/lib/categoryColors';
 
 const fetchCategoryAndRecipes = async (categorySlug: string | undefined): Promise<{ category: Category; recipes: Recipe[] }> => {
   if (!categorySlug) {
@@ -90,7 +91,7 @@ const CategoryPage: React.FC = () => {
           <div className="flex flex-row justify-between items-center gap-4">
           <h1 className="font-fredoka text-4xl text-choco flex items-center gap-3">
             {category?.icon && (
-              <span className={`inline-flex p-2 rounded-xl ${category.color || 'bg-pastelYellow'}`} aria-hidden="true">
+              <span className="inline-flex p-2 rounded-xl" style={getCategoryBgStyle(category.color)} aria-hidden="true">
                 <DynamicIcon name={category.icon} className="w-7 h-7 text-choco" strokeWidth={2} />
               </span>
             )}

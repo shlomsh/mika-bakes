@@ -14,9 +14,9 @@ const buttonVariants = cva(
         destructive:
           "bg-pastelOrange text-choco hover:bg-pastelOrange/80",
         outline:
-          "border border-choco bg-transparent text-choco hover:bg-pastelBlue/20",
+          "border border-choco bg-transparent text-choco hover:bg-pastelYellow/30",
         secondary:
-          "bg-pastelBlue text-choco hover:bg-pastelBlue/80",
+          "bg-pastelYellow text-choco hover:bg-pastelYellow/80",
         ghost: "hover:bg-choco/10 text-choco",
         link: "text-choco underline-offset-4 hover:underline",
       },

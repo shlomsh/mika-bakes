@@ -84,7 +84,7 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe }) => {
             <Utensils className="h-5 w-5 text-choco/50 shrink-0" />
             אופן ההכנה
           </h2>
-          <StepList steps={recipe.recipe_instructions} accentBg="bg-pastelBlue" useHtml />
+          <StepList steps={recipe.recipe_instructions} accentBg="bg-pastelOrange" useHtml />
         </section>
       )}
 
@@ -125,7 +125,7 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe }) => {
       {(recipe.recipe_garnish_instructions && recipe.recipe_garnish_instructions.length > 0 || (recipe.recipe_garnish_ingredients && recipe.recipe_garnish_ingredients.length > 0)) && (
         <>
           <div className="divider-wavy my-2" />
-          <section className="bg-pastelGreen/25 rounded-3xl p-6 md:p-8 mb-4 animate-fade-up delay-400">
+          <section className="bg-coral/8 rounded-3xl p-6 md:p-8 mb-4 animate-fade-up delay-400">
             <h2 className="font-fredoka text-2xl text-choco mb-4 flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-choco/50 shrink-0" />
               תוספת
@@ -147,7 +147,7 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe }) => {
                   <Utensils className="h-4 w-4 text-choco/50 shrink-0" />
                   הכנה
                 </h3>
-                <StepList steps={recipe.recipe_garnish_instructions} accentBg="bg-pastelGreen" />
+                <StepList steps={recipe.recipe_garnish_instructions} accentBg="bg-pastelYellow" />
               </div>
             )}
           </section>

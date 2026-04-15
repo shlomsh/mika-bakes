@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getCategoryBgStyle } from "@/lib/categoryColors";
 
 interface CategoryCardsProps {
   categories: Category[];
@@ -33,7 +34,8 @@ const CategoryCards: React.FC<CategoryCardsProps> = ({ categories, onEdit }) => 
         >
           <TransitionLink to={`/category/${cat.slug}`} className="no-underline block h-full">
             <div
-              className={`rounded-2xl p-5 flex flex-col items-center justify-center text-center gap-2.5 h-32 card-lift cursor-pointer texture-noise ring-1 ring-white/60 ${cat.color || "bg-pastelYellow"}`}
+              className="rounded-2xl p-5 flex flex-col items-center justify-center text-center gap-2.5 h-32 card-lift cursor-pointer texture-noise ring-1 ring-white/60"
+              style={getCategoryBgStyle(cat.color)}
             >
               {cat.icon && (
                 <DynamicIcon

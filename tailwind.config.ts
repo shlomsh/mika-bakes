@@ -49,12 +49,12 @@ export default {
       },
       colors: {
         pastelYellow: "#ffd4a8", // apricot peach
-        pastelBlue: "#bae6fd",   // sky blue
+        pastelBlue:   "#bae6fd", // sky blue
         pastelOrange: "#fed7aa", // warm peach-orange
-        pastelGreen: "#bbf7d0",  // mint green
-        coral: "#f97316",        // bold accent / emphasis
-        choco: "#614e3e",
-        'off-white': '#faf9f7',
+        pastelGreen:  "#bbf7d0", // mint green
+        coral:        "#f97316", // bold accent / emphasis
+        choco:        "#614e3e",
+        'off-white':  '#faf9f7',
       },
       borderRadius: {
         ...{

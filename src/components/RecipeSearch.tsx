@@ -89,7 +89,7 @@ export function RecipeSearch() {
                   key={recipe.id}
                   value={recipe.name}
                   onSelect={() => handleSelect(recipe.id)}
-                  className="cursor-pointer flex items-center gap-4 py-2 data-[selected='true']:bg-pastelBlue/40"
+                  className="cursor-pointer flex items-center gap-4 py-2 data-[selected='true']:bg-pastelYellow/40"
                 >
                   <img
                     src={recipe.image_url || '/placeholder.svg'}
