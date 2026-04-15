@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { apiFetch } from "@/lib/apiClient";
+import { bustSwCache } from "@/lib/swCacheBust";
 import type { Category } from "@/types";
 import * as z from 'zod';
 import { categoryFormSchema } from "@/components/CategoryForm";
@@ -38,6 +39,7 @@ export const useCategories = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['categories'] });
+      bustSwCache('/api/categories');
     },
     onError: (err: Error) => {
       toast({ variant: "destructive", title: "שגיאה", description: `עדכון הקטגוריה נכשל: ${err.message}` });

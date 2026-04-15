@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/apiClient';
+import { bustSwCache } from '@/lib/swCacheBust';
 import RecipeEditForm from '@/components/RecipeEditForm';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -46,6 +47,7 @@ const RecipePage: React.FC = () => {
       toast({ title: "הצלחה!", description: "המתכון נמחק בהצלחה." });
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
       queryClient.invalidateQueries({ queryKey: ['recommendedRecipes'] });
+      bustSwCache(`/api/recipe/${recipeId}`, '/api/recipes/recommended', '/api/categories');
       navigate('/');
     },
     onError: (err: Error) => {
@@ -66,6 +68,7 @@ const RecipePage: React.FC = () => {
     queryClient.invalidateQueries({ queryKey: ['recipe', recipeId || null] });
     queryClient.invalidateQueries({ queryKey: ['recommendedRecipes'] });
     queryClient.invalidateQueries({ queryKey: ['recipes'] });
+    bustSwCache(`/api/recipe/${recipeId}`, '/api/recipes/recommended', '/api/categories');
     refetch();
   };
 

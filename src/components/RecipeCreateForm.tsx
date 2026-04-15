@@ -15,6 +15,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { recipeSchema, RecipeFormValues } from '@/schemas/recipeSchema';
 import { createRecipe } from '@/api/recipes';
+import { bustSwCache } from '@/lib/swCacheBust';
 import IngredientsFieldArray from './form/IngredientsFieldArray';
 import InstructionsFieldArray from './form/InstructionsFieldArray';
 import IngredientsListFieldArray from './form/IngredientsListFieldArray';
@@ -54,6 +55,7 @@ const RecipeCreateForm: React.FC<RecipeCreateFormProps> = ({ categoryId }) => {
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
       queryClient.invalidateQueries({ queryKey: ['recommendedRecipes'] });
       queryClient.invalidateQueries({ queryKey: ['category', categoryId] });
+      bustSwCache('/api/recipes/recommended', '/api/categories');
       navigate(`/recipe/${recipeId}`);
     },
     onError: (error: Error) => {
