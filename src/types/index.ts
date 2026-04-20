@@ -21,7 +21,7 @@ export interface Recipe {
   recommended: boolean;
   created_at: string;
   updated_at: string;
-  categories?: { id: string; slug: string; name: string } | null;
+  categories?: { id: string; slug: string; name: string; color: string | null } | null;
 }
 
 export interface RecipeWithDetails extends Recipe {

@@ -31,7 +31,7 @@ async function handleGet(id: string, res: VercelResponse) {
       garnishInstructions,
     ] = await Promise.all([
       sql`
-        SELECT r.*, json_build_object('id', c.id, 'slug', c.slug, 'name', c.name) AS categories
+        SELECT r.*, json_build_object('id', c.id, 'slug', c.slug, 'name', c.name, 'color', c.color) AS categories
         FROM recipes r
         LEFT JOIN categories c ON r.category_id = c.id
         WHERE r.id = ${id}

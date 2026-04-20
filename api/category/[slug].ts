@@ -19,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Fetch recipes for this category, including nested category data
     const recipes = await sql`
-      SELECT r.*, json_build_object('id', c.id, 'slug', c.slug, 'name', c.name) AS categories
+      SELECT r.*, json_build_object('id', c.id, 'slug', c.slug, 'name', c.name, 'color', c.color) AS categories
       FROM recipes r
       LEFT JOIN categories c ON r.category_id = c.id
       WHERE r.category_id = ${category.id}

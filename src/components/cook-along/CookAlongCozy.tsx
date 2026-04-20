@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { RecipeWithDetails } from '@/types';
 import ModeSelector, { CookAlongMode } from './ModeSelector';
+import { getCategoryThemeVars } from '@/lib/categoryTheme';
 
 type CozyItem =
   | { kind: 'step'; description: string; step_number: number }
@@ -37,6 +38,7 @@ interface Props {
 
 const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose }) => {
   const STORAGE_KEY = `mika.cozy.${recipe.id}`;
+  const categoryTheme = getCategoryThemeVars(recipe.categories?.color);
   const items = buildItems(recipe);
   const dotCount = items.filter(i => i.kind !== 'done').length;
 
@@ -49,9 +51,14 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
 
   const touchStartX = useRef<number | null>(null);
   const current = items[idx];
+  const isDone = current.kind === 'done';
 
   useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify({ stepIndex: idx })); } catch {}
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ stepIndex: idx }));
+    } catch {
+      // Ignore storage access issues and keep the current session usable.
+    }
   }, [idx, STORAGE_KEY]);
 
   const next = useCallback(() => setIdx(i => Math.min(items.length - 1, i + 1)), [items.length]);
@@ -100,10 +107,10 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
       <span className="baking-pattern" aria-hidden="true" />
 
       {/* Header */}
-      <header className="relative z-20 flex items-center justify-between gap-3 px-5 sm:px-8 py-4 shrink-0">
+      <header className="relative z-20 grid grid-cols-[minmax(5.5rem,1fr)_auto_minmax(5.5rem,1fr)] items-center gap-3 px-5 sm:px-8 py-4 shrink-0">
         <button
           onClick={onClose}
-          className="flex items-center gap-2 text-choco/70 hover:text-choco transition no-tap-highlight"
+          className="flex items-center justify-self-start gap-2 text-choco/70 hover:text-choco transition no-tap-highlight"
           aria-label="סגור"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
@@ -111,8 +118,10 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
           </svg>
           <span className="text-sm font-fredoka">סגור</span>
         </button>
-        <ModeSelector mode={mode} onChange={onModeChange} />
-        <div className="text-sm text-choco/60 font-fredoka tabular-nums min-w-[3rem] text-left">
+        <div className="justify-self-center">
+          <ModeSelector mode={mode} onChange={onModeChange} categoryColor={recipe.categories?.color} />
+        </div>
+        <div className="min-w-[5.5rem] justify-self-end text-sm text-choco/60 font-fredoka tabular-nums text-left">
           {current.kind !== 'done' && currentStepNum != null
             ? `${currentStepNum}/${totalSteps}`
             : ''}
@@ -121,7 +130,7 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
 
       {/* Progress dots */}
       <div className="relative z-10 px-5 sm:px-8 mb-4 shrink-0">
-        <div className="flex gap-1.5 max-w-3xl mx-auto">
+        <div className="flex items-center gap-1.5 max-w-3xl mx-auto">
           {items.map((item, i) => {
             if (item.kind === 'done') return null;
             const isActive = i === idx;
@@ -130,13 +139,23 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
               <button
                 key={i}
                 onClick={() => setIdx(i)}
-                className={[
-                  'flex-1 rounded-full transition-all no-tap-highlight',
-                  item.kind === 'divider' ? 'h-2.5' : 'h-1.5',
-                  isActive ? 'bg-coral' : isPast ? 'bg-coral/40' : 'bg-choco/10',
-                ].join(' ')}
+                className="flex flex-1 items-center appearance-none border-0 bg-transparent p-0 no-tap-highlight"
                 aria-label={`עבור לפריט ${i + 1}`}
-              />
+              >
+                <span
+                  className={[
+                    'block h-1.5 w-full rounded-full transition-all',
+                    isDone
+                      ? 'bg-pastelGreen/70'
+                      : isActive
+                        ? 'bg-[var(--category-accent)]'
+                        : isPast
+                          ? 'bg-[var(--category-accent-track)]'
+                          : 'bg-choco/10',
+                  ].join(' ')}
+                  style={categoryTheme}
+                />
+              </button>
             );
           })}
         </div>
@@ -151,7 +170,10 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
           {current.kind === 'step' && (
             <>
               <div className="text-center mb-5">
-                <span className="text-coral font-fredoka text-sm uppercase tracking-widest">
+                <span
+                  className="font-fredoka text-sm uppercase tracking-widest text-[var(--category-accent)]"
+                  style={categoryTheme}
+                >
                   שלב {currentStepNum} מתוך {totalSteps}
                 </span>
               </div>
@@ -171,13 +193,13 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
           )}
 
           {current.kind === 'done' && (
-            <div className="bg-white/85 glass rounded-3xl p-10 shadow-lg border border-white/70 text-center">
+            <div className="rounded-3xl p-10 shadow-lg border border-pastelGreen/50 text-center bg-[color:oklch(98%_0.02_145)]">
               <div className="text-5xl mb-4">🎉</div>
               <p className="font-fredoka text-3xl text-choco mb-2">סיימתם!</p>
-              <p className="text-choco/60 mb-8">כל הכבוד — המנה מוכנה!</p>
+              <p className="text-choco/70 mb-8">כל הכבוד — המנה מוכנה!</p>
               <button
                 onClick={(e) => { e.stopPropagation(); onClose(); }}
-                className="bg-choco hover:bg-choco/85 transition-colors text-white font-fredoka text-lg px-8 py-3 rounded-2xl shadow-lg shadow-choco/20"
+                className="bg-coral hover:bg-coralDeep transition-colors text-white font-fredoka text-lg px-8 py-3 rounded-2xl shadow-lg shadow-coral/30"
               >
                 חזרה למתכון
               </button>
@@ -205,7 +227,8 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
           {current.kind !== 'done' ? (
             <button
               onClick={next}
-              className="h-14 px-7 rounded-full bg-choco hover:bg-choco/85 text-white shadow-xl shadow-choco/25 font-fredoka text-base flex items-center gap-2 no-tap-highlight transition-colors"
+              className="h-14 px-7 rounded-full bg-[var(--category-accent-button)] hover:bg-[var(--category-accent-button-hover)] text-choco shadow-xl shadow-[var(--category-accent-shadow)] font-fredoka text-base flex items-center gap-2 no-tap-highlight transition-colors"
+              style={categoryTheme}
               aria-label="שלב הבא"
             >
               הבא

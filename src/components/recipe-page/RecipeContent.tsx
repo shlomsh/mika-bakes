@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ListChecks, Utensils, Soup, Sparkles } from 'lucide-react';
 import { RecipeWithDetails } from './types';
 import ModeSelector, { CookAlongMode, readStoredMode } from '@/components/cook-along/ModeSelector';
+import { getCategoryThemeVars } from '@/lib/categoryTheme';
 
 interface RecipeContentProps {
   recipe: RecipeWithDetails;
@@ -24,11 +25,11 @@ const IngredientChecklist: React.FC<{ ingredients: { description: string }[]; ro
   </div>
 );
 
-const StepList: React.FC<{ steps: { step_number: number; description: string }[]; accentBg: string; useHtml?: boolean }> = ({ steps, accentBg, useHtml }) => (
+const StepList: React.FC<{ steps: { step_number: number; description: string }[]; accentStyle?: React.CSSProperties; accentBg?: string; useHtml?: boolean }> = ({ steps, accentStyle, accentBg, useHtml }) => (
   <ol className="w-full list-none space-y-6 text-choco/90">
     {steps.map((step) => (
       <li key={step.step_number} className="flex items-start gap-x-4 animate-fade-up" style={{ animationDelay: `${step.step_number * 60}ms` }}>
-        <div className={`step-circle ${accentBg}`}>
+        <div className={`step-circle ${accentBg || ''}`} style={accentStyle}>
           {step.step_number}
         </div>
         {useHtml ? (
@@ -48,6 +49,11 @@ const StepList: React.FC<{ steps: { step_number: number; description: string }[]
 
 const RecipeContent: React.FC<RecipeContentProps> = ({ recipe, cookAlongPath }) => {
   const [cookMode, setCookMode] = useState<CookAlongMode>(readStoredMode);
+  const categoryTheme = getCategoryThemeVars(recipe.categories?.color);
+  const categoryAccentCircle = {
+    ...categoryTheme,
+    backgroundColor: 'var(--category-accent-button)',
+  } as React.CSSProperties;
 
   return (
     <div className="animate-fade-up">
@@ -71,7 +77,14 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe, cookAlongPath }) 
 
       {/* Cook-Along CTA */}
       {cookAlongPath && (
-        <div className="rounded-3xl mb-6 overflow-hidden animate-fade-up shadow-md" style={{ background: 'oklch(97% 0.018 55)' }}>
+        <div
+          className="rounded-3xl mb-6 overflow-hidden animate-fade-up shadow-md"
+          style={{
+            ...categoryTheme,
+            backgroundColor: 'var(--category-accent-soft)',
+            boxShadow: '0 18px 38px -28px var(--category-accent-shadow)',
+          }}
+        >
           <div className="flex flex-col sm:flex-row items-center sm:items-stretch gap-0">
             {/* Text block */}
             <div className="flex-1 px-6 pt-6 pb-4 sm:py-6 text-center sm:text-right">
@@ -82,10 +95,11 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe, cookAlongPath }) 
             </div>
             {/* Controls block */}
             <div className="flex flex-col sm:flex-row items-center gap-3 px-6 pb-6 sm:py-6 sm:border-r border-choco/8 shrink-0">
-              <ModeSelector mode={cookMode} onChange={setCookMode} />
+              <ModeSelector mode={cookMode} onChange={setCookMode} categoryColor={recipe.categories?.color} />
               <Link
                 to={`${cookAlongPath}?mode=${cookMode}`}
-                className="bg-choco hover:bg-choco/85 active:scale-95 transition-all text-white font-fredoka text-lg px-6 py-2.5 rounded-2xl shadow-md shadow-choco/20 flex items-center gap-2 no-tap-highlight"
+                className="bg-[var(--category-accent-button)] hover:bg-[var(--category-accent-button-hover)] active:scale-95 transition-all text-choco font-fredoka text-lg px-6 py-2.5 rounded-2xl shadow-md shadow-[var(--category-accent-shadow)] flex items-center gap-2 no-tap-highlight"
+                style={categoryTheme}
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M16 5v14l-11-7z" /></svg>
                 התחילו לבשל
@@ -115,7 +129,7 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe, cookAlongPath }) 
             <Utensils className="h-5 w-5 text-choco/50 shrink-0" />
             אופן ההכנה
           </h2>
-          <StepList steps={recipe.recipe_instructions} accentBg="bg-pastelOrange" useHtml />
+          <StepList steps={recipe.recipe_instructions} accentStyle={categoryAccentCircle} useHtml />
         </section>
       )}
 
@@ -188,14 +202,22 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe, cookAlongPath }) 
       {/* Bottom CTA */}
       {cookAlongPath && (
         <section className="bg-off-white rounded-3xl p-6 md:p-8 animate-fade-up delay-500">
-          <div className="p-5 bg-choco/5 rounded-2xl flex items-center justify-between gap-4 border border-choco/10">
+          <div
+            className="p-5 rounded-2xl flex items-center justify-between gap-4 border"
+            style={{
+              ...categoryTheme,
+              backgroundColor: 'var(--category-accent-soft)',
+              borderColor: 'var(--category-accent-border)',
+            }}
+          >
             <div>
               <div className="font-fredoka text-choco">מוכנים לבשל?</div>
               <div className="text-sm text-choco/60">פתחו את מצב הבישול לקבלת הוראות צעד-צעד</div>
             </div>
             <Link
               to={`${cookAlongPath}?mode=${cookMode}`}
-              className="bg-choco hover:bg-choco/85 transition-colors text-white font-fredoka px-5 py-2.5 rounded-xl shadow shadow-choco/20 flex items-center gap-2 shrink-0 no-tap-highlight"
+              className="bg-[var(--category-accent-button)] hover:bg-[var(--category-accent-button-hover)] transition-colors text-choco font-fredoka px-5 py-2.5 rounded-xl shadow shadow-[var(--category-accent-shadow)] flex items-center gap-2 shrink-0 no-tap-highlight"
+              style={categoryTheme}
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M16 5v14l-11-7z" /></svg>
               התחילו

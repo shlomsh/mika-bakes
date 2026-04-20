@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RecipeWithDetails } from '@/types';
 import ModeSelector, { CookAlongMode } from './ModeSelector';
+import { getCategoryThemeVars } from '@/lib/categoryTheme';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Props {
   recipe: RecipeWithDetails;
@@ -49,13 +51,17 @@ function buildSteps(recipe: RecipeWithDetails): StepItem[] {
 }
 
 const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose }) => {
+  const categoryTheme = getCategoryThemeVars(recipe.categories?.color);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
-  const [activeIdx, setActiveIdx] = useState(0);
+  const isMobile = useIsMobile();
+  const [viewportIdx, setViewportIdx] = useState(0);
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [ingredientsOpen, setIngredientsOpen] = useState(false);
   const stepRefs = useRef<(HTMLElement | null)[]>([]);
 
   const ingredients = buildIngredients(recipe);
   const steps = buildSteps(recipe);
+  const activeIdx = !isMobile && hoveredIdx !== null ? hoveredIdx : viewportIdx;
   const totalSteps = steps.filter(s => s.kind === 'step').length;
   const activeStepNum = steps.slice(0, activeIdx + 1).filter(s => s.kind === 'step').length;
   const progress = totalSteps > 0 ? (activeStepNum / totalSteps) * 100 : 0;
@@ -70,7 +76,7 @@ const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose 
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
         if (visible[0]) {
           const i = Number(visible[0].target.getAttribute('data-step-idx'));
-          if (!isNaN(i)) setActiveIdx(i);
+          if (!isNaN(i)) setViewportIdx(i);
         }
       },
       { threshold: 0.5 }
@@ -92,7 +98,12 @@ const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose 
         return (
           <div key={section}>
             {sections.length > 1 && (
-              <div className="text-coral font-fredoka text-xs uppercase tracking-widest mb-2 px-1">{section}</div>
+              <div
+                className="font-fredoka text-xs uppercase tracking-widest mb-2 px-1 text-[var(--category-accent)]"
+                style={categoryTheme}
+              >
+                {section}
+              </div>
             )}
             <ul className="space-y-0.5">
               {sectionItems.map(ing => (
@@ -136,10 +147,10 @@ const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose 
     >
       {/* Sticky header */}
       <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-sm border-b border-choco/8 shrink-0">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-4">
+        <div className="max-w-6xl mx-auto grid h-14 grid-cols-[minmax(5.5rem,1fr)_auto_minmax(5.5rem,1fr)] items-center gap-3 px-5 sm:px-8">
           <button
             onClick={onClose}
-            className="flex items-center gap-2 text-choco/70 hover:text-choco no-tap-highlight shrink-0 transition-colors"
+            className="flex items-center justify-self-start gap-2 text-choco/70 hover:text-choco no-tap-highlight shrink-0 transition-colors"
             aria-label="סגור"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
@@ -147,14 +158,18 @@ const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose 
             </svg>
             <span className="text-sm font-fredoka hidden sm:inline">סגור</span>
           </button>
-          <div className="font-fredoka text-choco truncate text-sm sm:text-base flex-1 text-center">{recipe.name}</div>
-          <ModeSelector mode={mode} onChange={onModeChange} />
+          <div className="justify-self-center">
+            <ModeSelector mode={mode} onChange={onModeChange} categoryColor={recipe.categories?.color} />
+          </div>
+          <div className="min-w-[5.5rem] justify-self-end font-fredoka text-choco truncate text-sm sm:text-base text-left">
+            {recipe.name}
+          </div>
         </div>
         {/* Progress strip */}
         <div className="h-0.5 bg-choco/5">
           <div
-            className="h-full bg-coral transition-all duration-500"
-            style={{ width: `${progress}%` }}
+            className="h-full bg-[var(--category-accent)] transition-all duration-500"
+            style={{ ...categoryTheme, width: `${progress}%` }}
           />
         </div>
       </header>
@@ -169,7 +184,11 @@ const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose 
             <div className="lg:hidden">
               <button
                 onClick={() => setIngredientsOpen(o => !o)}
-                className="w-full flex items-center justify-between gap-2 bg-pastelYellow/30 hover:bg-pastelYellow/50 transition-colors rounded-xl px-4 py-3 mb-3 font-fredoka text-choco"
+                className="w-full flex items-center justify-between gap-2 hover:bg-[var(--category-accent-surface)] transition-colors rounded-xl px-4 py-3 mb-3 font-fredoka text-choco"
+                style={{
+                  ...categoryTheme,
+                  backgroundColor: 'var(--category-accent-soft)',
+                }}
               >
                 <span>מצרכים ({ingredients.length})</span>
                 <svg
@@ -214,18 +233,30 @@ const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose 
                   key={item.key}
                   ref={el => { stepRefs.current[i] = el; }}
                   data-step-idx={i}
+                  onMouseEnter={() => {
+                    if (!isMobile) setHoveredIdx(i);
+                  }}
+                  onMouseLeave={() => {
+                    if (!isMobile) setHoveredIdx(null);
+                  }}
+                  onFocus={() => setHoveredIdx(i)}
+                  onBlur={() => setHoveredIdx(null)}
+                  tabIndex={0}
                   className={[
-                    'rounded-2xl p-5 sm:p-6 border-2 transition-all duration-300',
+                    'rounded-2xl p-5 sm:p-6 border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--category-accent-border)]',
+                    !isMobile ? 'cursor-pointer' : '',
                     isActive
-                      ? 'border-coral/35 bg-white shadow-md'
+                      ? 'border-[var(--category-accent-border)] bg-[var(--category-accent-soft)] shadow-sm'
                       : 'border-transparent bg-white/60',
                   ].join(' ')}
+                  style={categoryTheme}
                 >
                   <div className="flex items-start gap-4">
                     <div className={[
                       'w-9 h-9 rounded-full flex items-center justify-center font-fredoka text-base shrink-0 transition-colors',
-                      isActive ? 'bg-coral text-white' : 'bg-pastelOrange/60 text-choco',
-                    ].join(' ')}>
+                      isActive ? 'bg-[var(--category-accent)] text-white' : 'bg-[var(--category-accent-button)] text-choco',
+                    ].join(' ')}
+                    style={categoryTheme}>
                       {item.step_number}
                     </div>
                     <p className="text-choco/85 leading-relaxed flex-1 pt-1">{item.description}</p>
@@ -235,7 +266,7 @@ const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose 
             })}
 
             {/* Completion card */}
-            <div className="rounded-2xl p-6 bg-pastelGreen/20 border border-pastelGreen/40 text-center mt-4">
+            <div className="rounded-2xl p-6 border border-pastelGreen/50 text-center mt-4 bg-[color:oklch(98%_0.02_145)] shadow-sm shadow-pastelGreen/20">
               <div className="text-3xl mb-2">🎉</div>
               <div className="font-fredoka text-xl text-choco">סיימתם! בתיאבון</div>
             </div>

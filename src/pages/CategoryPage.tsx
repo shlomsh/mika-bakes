@@ -12,6 +12,7 @@ import RecipeCardSkeleton from '@/components/skeletons/RecipeCardSkeleton';
 import AppHeader from '@/components/AppHeader';
 import Breadcrumb from '@/components/Breadcrumb';
 import { getCategoryBgStyle } from '@/lib/categoryColors';
+import { getCategoryThemeVars } from '@/lib/categoryTheme';
 
 const fetchCategoryAndRecipes = async (categorySlug: string | undefined): Promise<{ category: Category; recipes: Recipe[] }> => {
   if (!categorySlug) {
@@ -32,6 +33,7 @@ const CategoryPage: React.FC = () => {
 
   const category = data?.category;
   const recipesForCategory = data?.recipes || [];
+  const categoryTheme = getCategoryThemeVars(category?.color);
 
   const formattedCategoryName = category
     ? category.name
@@ -88,23 +90,37 @@ const CategoryPage: React.FC = () => {
             { label: 'בית', to: '/', icon: <Home className="h-3.5 w-3.5" /> },
             { label: formattedCategoryName },
           ]} />
-          <div className="flex flex-row justify-between items-center gap-4">
-          <h1 className="font-fredoka text-4xl text-choco flex items-center gap-3">
-            {category?.icon && (
-              <span className="inline-flex p-2 rounded-xl" style={getCategoryBgStyle(category.color)} aria-hidden="true">
-                <DynamicIcon name={category.icon} className="w-7 h-7 text-choco" strokeWidth={2} />
-              </span>
+          <div
+            className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 rounded-[2rem] border px-5 py-5 shadow-sm"
+            style={{
+              ...categoryTheme,
+              backgroundColor: 'var(--category-accent-surface)',
+              borderColor: 'var(--category-accent-border)',
+              boxShadow: '0 18px 36px -28px var(--category-accent-shadow)',
+            }}
+          >
+            <div className="flex items-center gap-3">
+              {category?.icon && (
+                <span className="inline-flex p-2.5 rounded-2xl ring-1 ring-white/70" style={getCategoryBgStyle(category.color)} aria-hidden="true">
+                  <DynamicIcon name={category.icon} className="w-7 h-7 text-choco" strokeWidth={2} />
+                </span>
+              )}
+              <h1 className="font-fredoka text-4xl text-choco text-right">
+                {formattedCategoryName}
+              </h1>
+            </div>
+            {isAuthenticated && category && (
+              <Button
+                asChild
+                className="shrink-0 border-0 bg-[var(--category-accent-button)] text-choco shadow-sm shadow-[var(--category-accent-shadow)] hover:bg-[var(--category-accent-button-hover)]"
+                style={categoryTheme}
+              >
+                <Link to={`/new-recipe?categoryId=${category.id}`} aria-label="הוסף מתכון">
+                  <Plus className="h-4 w-4 sm:ml-2" />
+                  <span className="hidden sm:inline">הוסף מתכון</span>
+                </Link>
+              </Button>
             )}
-            {formattedCategoryName}
-          </h1>
-          {isAuthenticated && (
-            <Button asChild className="shrink-0">
-              <Link to={`/new-recipe?categoryId=${category.id}`} aria-label="הוסף מתכון">
-                <Plus className="h-4 w-4 sm:ml-2" />
-                <span className="hidden sm:inline">הוסף מתכון</span>
-              </Link>
-            </Button>
-          )}
           </div>
         </header>
 
@@ -116,7 +132,14 @@ const CategoryPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
+          <div
+            className="text-center py-16 rounded-[2rem] border"
+            style={{
+              ...categoryTheme,
+              backgroundColor: 'var(--category-accent-soft)',
+              borderColor: 'var(--category-accent-border)',
+            }}
+          >
             <p className="text-5xl mb-4">🥐</p>
             <p className="font-fredoka text-2xl text-choco mb-2">עדיין אין מתכונים כאן</p>
             <p className="text-choco/60 leading-relaxed">מיקה עובדת על זה! בקרוב יגיעו מתכונים מדהימים לקטגוריה הזו.</p>
