@@ -107,24 +107,29 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
       <span className="baking-pattern" aria-hidden="true" />
 
       {/* Header */}
-      <header className="relative z-20 grid grid-cols-[minmax(5.5rem,1fr)_auto_minmax(5.5rem,1fr)] items-center gap-3 px-5 sm:px-8 py-4 shrink-0">
-        <button
-          onClick={onClose}
-          className="flex items-center justify-self-start gap-2 text-choco/70 hover:text-choco transition no-tap-highlight"
-          aria-label="סגור"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-            <path d="M6 6l12 12M18 6 6 18" />
-          </svg>
-          <span className="text-sm font-fredoka">סגור</span>
-        </button>
-        <div className="justify-self-center">
-          <ModeSelector mode={mode} onChange={onModeChange} categoryColor={recipe.categories?.color} />
+      <header className="relative z-20 shrink-0 px-5 sm:px-8 pt-4 pb-3">
+        <div className="grid grid-cols-[minmax(5.5rem,1fr)_auto_minmax(5.5rem,1fr)] items-center gap-3">
+          <button
+            onClick={onClose}
+            className="flex items-center justify-self-start gap-2 text-choco/70 hover:text-choco transition no-tap-highlight"
+            aria-label="סגור"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+            <span className="text-sm font-fredoka">סגור</span>
+          </button>
+          <div className="justify-self-center">
+            <ModeSelector mode={mode} onChange={onModeChange} categoryColor={recipe.categories?.color} />
+          </div>
+          <div className="min-w-[5.5rem] justify-self-end text-sm text-choco/60 font-fredoka tabular-nums text-left">
+            {current.kind !== 'done' && currentStepNum != null
+              ? `${currentStepNum}/${totalSteps}`
+              : ''}
+          </div>
         </div>
-        <div className="min-w-[5.5rem] justify-self-end text-sm text-choco/60 font-fredoka tabular-nums text-left">
-          {current.kind !== 'done' && currentStepNum != null
-            ? `${currentStepNum}/${totalSteps}`
-            : ''}
+        <div className="text-center mt-2">
+          <span className="font-fredoka text-base text-choco/70 truncate">{recipe.name}</span>
         </div>
       </header>
 
@@ -163,7 +168,7 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
 
       {/* Step card */}
       <main
-        className="flex-1 flex flex-col items-center justify-center px-5 sm:px-8 pb-28 relative z-10"
+        className="flex-1 flex flex-col items-center justify-start pt-10 sm:pt-14 px-5 sm:px-8 pb-28 relative z-10"
         onClick={onTapZone}
       >
         <div key={idx} className="w-full max-w-2xl animate-step-pop">
@@ -215,19 +220,20 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
           <button
             onClick={prev}
             disabled={idx === 0}
-            className="w-14 h-14 rounded-full bg-white/90 border border-choco/10 shadow-lg grid place-items-center disabled:opacity-30 hover:bg-pastelYellow/40 transition no-tap-highlight"
+            className="h-14 px-6 rounded-full bg-white/90 border border-choco/10 shadow-lg flex items-center gap-2 disabled:opacity-30 hover:bg-white transition no-tap-highlight font-fredoka text-base text-choco"
             aria-label="שלב קודם"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-choco">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
               <path d="M9 6l6 6-6 6" />
             </svg>
+            קודם
           </button>
 
           {/* next — left side in RTL */}
           {current.kind !== 'done' ? (
             <button
               onClick={next}
-              className="h-14 px-7 rounded-full bg-[var(--category-accent-button)] hover:bg-[var(--category-accent-button-hover)] text-choco shadow-xl shadow-[var(--category-accent-shadow)] font-fredoka text-base flex items-center gap-2 no-tap-highlight transition-colors"
+              className="h-14 px-6 rounded-full bg-[var(--category-accent-button)] hover:bg-[var(--category-accent-button-hover)] text-choco shadow-xl shadow-[var(--category-accent-shadow)] font-fredoka text-base flex items-center gap-2 no-tap-highlight transition-colors"
               style={categoryTheme}
               aria-label="שלב הבא"
             >
@@ -237,7 +243,7 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
               </svg>
             </button>
           ) : (
-            <div className="w-14" />
+            <div className="h-14 px-6" />
           )}
         </div>
       </div>
