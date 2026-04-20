@@ -14,6 +14,8 @@ interface RecipeDisplayProps {
 }
 
 const RecipeDisplay: React.FC<RecipeDisplayProps> = (props) => {
+  const cookAlongPath = `/recipe/${props.recipe.id}/cook`;
+
   return (
     <div className="min-h-screen w-full flex flex-col animate-fade-in bg-gradient-mesh" style={{ direction: "rtl" }}>
       <span className="baking-pattern" aria-hidden="true" />
@@ -21,7 +23,7 @@ const RecipeDisplay: React.FC<RecipeDisplayProps> = (props) => {
       <div className="flex flex-col items-center px-4 md:px-8 py-8 flex-1 relative z-10">
         <RecipeHeader {...props} />
         <main className="w-full max-w-5xl">
-          <RecipeContent recipe={props.recipe} />
+          <RecipeContent recipe={props.recipe} cookAlongPath={cookAlongPath} />
         </main>
       </div>
     </div>

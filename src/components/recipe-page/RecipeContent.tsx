@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ListChecks, Utensils, Soup, Sparkles } from 'lucide-react';
 import { RecipeWithDetails } from './types';
+import ModeSelector, { CookAlongMode, readStoredMode } from '@/components/cook-along/ModeSelector';
 
 interface RecipeContentProps {
   recipe: RecipeWithDetails;
+  cookAlongPath?: string;
 }
 
 const IngredientChecklist: React.FC<{ ingredients: { description: string }[]; rowAccent: string }> = ({ ingredients, rowAccent }) => (
@@ -43,11 +46,13 @@ const StepList: React.FC<{ steps: { step_number: number; description: string }[]
   </ol>
 );
 
-const RecipeContent: React.FC<RecipeContentProps> = ({ recipe }) => {
+const RecipeContent: React.FC<RecipeContentProps> = ({ recipe, cookAlongPath }) => {
+  const [cookMode, setCookMode] = useState<CookAlongMode>(readStoredMode);
+
   return (
     <div className="animate-fade-up">
       {/* Full-bleed hero image */}
-      <div className="relative rounded-3xl overflow-hidden shadow-xl mb-8">
+      <div className="relative rounded-3xl overflow-hidden shadow-xl mb-6">
         <img
           src={recipe.image_url || '/placeholder.svg'}
           alt={recipe.name}
@@ -63,6 +68,32 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe }) => {
           </div>
         )}
       </div>
+
+      {/* Cook-Along CTA */}
+      {cookAlongPath && (
+        <div className="rounded-3xl mb-6 overflow-hidden animate-fade-up shadow-md" style={{ background: 'oklch(97% 0.018 55)' }}>
+          <div className="flex flex-col sm:flex-row items-center sm:items-stretch gap-0">
+            {/* Text block */}
+            <div className="flex-1 px-6 pt-6 pb-4 sm:py-6 text-center sm:text-right">
+              <h2 className="font-fredoka text-[1.6rem] leading-tight text-choco">בואו נבשל יחד 🧁</h2>
+              <p className="text-sm text-choco/55 leading-relaxed mt-1">
+                שלב אחר שלב, מסך גדול — הידיים נשארות במטבח.
+              </p>
+            </div>
+            {/* Controls block */}
+            <div className="flex flex-col sm:flex-row items-center gap-3 px-6 pb-6 sm:py-6 sm:border-r border-choco/8 shrink-0">
+              <ModeSelector mode={cookMode} onChange={setCookMode} />
+              <Link
+                to={`${cookAlongPath}?mode=${cookMode}`}
+                className="bg-choco hover:bg-choco/85 active:scale-95 transition-all text-white font-fredoka text-lg px-6 py-2.5 rounded-2xl shadow-md shadow-choco/20 flex items-center gap-2 no-tap-highlight"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M16 5v14l-11-7z" /></svg>
+                התחילו לבשל
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Ingredients — apricot tint */}
       {recipe.recipe_ingredients && recipe.recipe_ingredients.length > 0 && (
@@ -125,7 +156,7 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe }) => {
       {(recipe.recipe_garnish_instructions && recipe.recipe_garnish_instructions.length > 0 || (recipe.recipe_garnish_ingredients && recipe.recipe_garnish_ingredients.length > 0)) && (
         <>
           <div className="divider-wavy my-2" />
-          <section className="bg-coral/8 rounded-3xl p-6 md:p-8 mb-4 animate-fade-up delay-400">
+          <section className="bg-pastelPlum/30 rounded-3xl p-6 md:p-8 mb-4 animate-fade-up delay-400">
             <h2 className="font-fredoka text-2xl text-choco mb-4 flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-choco/50 shrink-0" />
               תוספת
@@ -147,11 +178,30 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe }) => {
                   <Utensils className="h-4 w-4 text-choco/50 shrink-0" />
                   הכנה
                 </h3>
-                <StepList steps={recipe.recipe_garnish_instructions} accentBg="bg-pastelYellow" />
+                <StepList steps={recipe.recipe_garnish_instructions} accentBg="bg-pastelPlum" />
               </div>
             )}
           </section>
         </>
+      )}
+
+      {/* Bottom CTA */}
+      {cookAlongPath && (
+        <section className="bg-off-white rounded-3xl p-6 md:p-8 animate-fade-up delay-500">
+          <div className="p-5 bg-choco/5 rounded-2xl flex items-center justify-between gap-4 border border-choco/10">
+            <div>
+              <div className="font-fredoka text-choco">מוכנים לבשל?</div>
+              <div className="text-sm text-choco/60">פתחו את מצב הבישול לקבלת הוראות צעד-צעד</div>
+            </div>
+            <Link
+              to={`${cookAlongPath}?mode=${cookMode}`}
+              className="bg-choco hover:bg-choco/85 transition-colors text-white font-fredoka px-5 py-2.5 rounded-xl shadow shadow-choco/20 flex items-center gap-2 shrink-0 no-tap-highlight"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M16 5v14l-11-7z" /></svg>
+              התחילו
+            </Link>
+          </div>
+        </section>
       )}
     </div>
   );

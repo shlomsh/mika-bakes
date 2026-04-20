@@ -19,6 +19,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 const RecipePage = lazy(() => import("./pages/RecipePage"));
 const NewRecipePage = lazy(() => import("./pages/NewRecipePage"));
+const CookAlongPage = lazy(() => import("./pages/CookAlongPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +44,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/category/:categoryName" element={<CategoryPage />} />
               <Route path="/recipe/:recipeId" element={<RecipePage />} />
+              <Route path="/recipe/:recipeId/cook" element={<CookAlongPage />} />
               <Route path="/new-recipe" element={<NewRecipePage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

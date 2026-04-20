@@ -52,7 +52,9 @@ export default {
         pastelBlue:   "#bae6fd", // sky blue
         pastelOrange: "#fed7aa", // warm peach-orange
         pastelGreen:  "#bbf7d0", // mint green
-        coral:        "#f97316", // bold accent / emphasis
+        pastelPlum:   "#e9d5ff", // soft lavender — garnish section
+        coral:        "oklch(78% 0.13 38)", // warm salmon — category-card palette tone
+        coralDeep:    "oklch(70% 0.15 36)", // hover state
         choco:        "#614e3e",
         'off-white':  '#faf9f7',
       },
