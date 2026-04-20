@@ -17,9 +17,6 @@ const MikaHero: React.FC = () => (
 
     {/* Text */}
     <div className="sm:flex-1 flex flex-col items-end text-right animate-fade-up delay-100">
-      <span className="font-frankRuhl text-sm text-choco/50 tracking-widest mb-3">
-        הכירו את מיקה 🧁
-      </span>
       <h1
         className="font-fredoka text-choco leading-none mb-4"
         style={{ fontSize: "clamp(2.8rem, 7vw, 5rem)" }}

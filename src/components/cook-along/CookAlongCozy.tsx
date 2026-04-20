@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { RecipeWithDetails } from '@/types';
 import ModeSelector, { CookAlongMode } from './ModeSelector';
 import { getCategoryThemeVars } from '@/lib/categoryTheme';
@@ -39,8 +39,8 @@ interface Props {
 const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose }) => {
   const STORAGE_KEY = `mika.cozy.${recipe.id}`;
   const categoryTheme = getCategoryThemeVars(recipe.categories?.color);
-  const items = buildItems(recipe);
-  const dotCount = items.filter(i => i.kind !== 'done').length;
+  const items = useMemo(() => buildItems(recipe), [recipe]);
+  const dotCount = useMemo(() => items.filter(i => i.kind !== 'done').length, [items]);
 
   const [idx, setIdx] = useState(() => {
     try {
@@ -108,7 +108,7 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
 
       {/* Header */}
       <header className="relative z-20 shrink-0 px-5 sm:px-8 pt-4 pb-3">
-        <div className="grid grid-cols-[minmax(5.5rem,1fr)_auto_minmax(5.5rem,1fr)] items-center gap-3">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
           <button
             onClick={onClose}
             className="flex items-center justify-self-start gap-2 text-choco/70 hover:text-choco transition no-tap-highlight"
@@ -117,7 +117,6 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
               <path d="M6 6l12 12M18 6 6 18" />
             </svg>
-            <span className="text-sm font-fredoka">סגור</span>
           </button>
           <div className="justify-self-center">
             <ModeSelector mode={mode} onChange={onModeChange} categoryColor={recipe.categories?.color} />
@@ -220,30 +219,28 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
           <button
             onClick={prev}
             disabled={idx === 0}
-            className="h-14 px-6 rounded-full bg-white/90 border border-choco/10 shadow-lg flex items-center gap-2 disabled:opacity-30 hover:bg-white transition no-tap-highlight font-fredoka text-base text-choco"
+            className="w-14 h-14 rounded-full bg-white/90 border border-choco/10 shadow-lg grid place-items-center disabled:opacity-30 hover:bg-white transition no-tap-highlight"
             aria-label="שלב קודם"
           >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-choco">
               <path d="M9 6l6 6-6 6" />
             </svg>
-            קודם
           </button>
 
           {/* next — left side in RTL */}
           {current.kind !== 'done' ? (
             <button
               onClick={next}
-              className="h-14 px-6 rounded-full bg-[var(--category-accent-button)] hover:bg-[var(--category-accent-button-hover)] text-choco shadow-xl shadow-[var(--category-accent-shadow)] font-fredoka text-base flex items-center gap-2 no-tap-highlight transition-colors"
+              className="w-14 h-14 rounded-full bg-[var(--category-accent-button)] hover:bg-[var(--category-accent-button-hover)] text-choco shadow-xl shadow-[var(--category-accent-shadow)] grid place-items-center no-tap-highlight transition-colors"
               style={categoryTheme}
               aria-label="שלב הבא"
             >
-              הבא
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
                 <path d="M15 6l-6 6 6 6" />
               </svg>
             </button>
           ) : (
-            <div className="h-14 px-6" />
+            <div className="w-14 h-14" />
           )}
         </div>
       </div>

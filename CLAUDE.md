@@ -58,6 +58,7 @@ All page components are **lazy-loaded** via `React.lazy` + `Suspense`:
 /                        → Index.tsx
 /category/:categoryName  → CategoryPage.tsx
 /recipe/:recipeId        → RecipePage.tsx
+/recipe/:recipeId/cook   → CookAlongPage.tsx
 /new-recipe              → NewRecipePage.tsx
 *                        → NotFound.tsx
 ```
@@ -151,6 +152,11 @@ src/
 │   ├── recipes.ts              # createRecipe()
 │   └── search.ts               # searchRecipesByName()
 ├── components/
+│   ├── cook-along/             # Cook-along mode components
+│   │   ├── CookAlong.tsx       # Mode router (cozy vs studio)
+│   │   ├── CookAlongCozy.tsx   # Step-by-step card swipe mode
+│   │   ├── CookAlongStudio.tsx # All-steps scrollable kitchen mode
+│   │   └── ModeSelector.tsx    # Pill toggle + localStorage persistence
 │   ├── form/                   # Dynamic field array sub-components
 │   │   ├── IngredientsFieldArray.tsx
 │   │   ├── IngredientsListFieldArray.tsx
@@ -196,12 +202,14 @@ src/
 ├── lib/
 │   ├── apiClient.ts            # apiFetch<T>() — fetch with auto-auth header
 │   ├── categoryColors.ts       # getCategoryColor() / getCategoryBgStyle() — OKLCH palette
+│   ├── categoryTheme.ts        # getCategoryThemeVars() — CSS custom props from category color
 │   ├── swCacheBust.ts          # bustSwCache(...paths) — purge SW api-responses cache
 │   └── utils.ts                # cn() — clsx + twMerge
 ├── pages/
 │   ├── Index.tsx               # Home: MikaHero + CategoryCards + RecipePicks
 │   ├── CategoryPage.tsx        # Category detail + recipe list
 │   ├── RecipePage.tsx          # Recipe detail, edit/delete for admins
+│   ├── CookAlongPage.tsx       # Cook-along view at /recipe/:id/cook
 │   ├── NewRecipePage.tsx       # Auth-guarded create form, accepts ?categoryId=
 │   └── NotFound.tsx            # 404
 ├── schemas/
@@ -229,6 +237,10 @@ src/
 ### Category Colors
 
 The database stores Tailwind class names (e.g. `bg-rose-200`) as the `color` field on categories. **Do not use these class names directly in JSX.** Always resolve them via `getCategoryColor(colorClass)` or `getCategoryBgStyle(colorClass)` from `src/lib/categoryColors.ts`, which maps class names to OKLCH color values for perceptual uniformity.
+
+### Category Theme System
+
+For components that need a full palette derived from a category color (cook-along, recipe CTAs), use `getCategoryThemeVars(colorClass)` from `src/lib/categoryTheme.ts`. It returns a set of CSS custom properties (`--category-accent`, `--category-accent-soft`, `--category-accent-button`, etc.) generated via `color-mix(in oklab, ...)`. Spread the result into a `style` prop — Tailwind classes can then reference the vars with `bg-[var(--category-accent-button)]`.
 
 ### Service Worker Cache Busting
 
@@ -266,7 +278,7 @@ Configured in `vite.config.ts` via `VitePWA`. The SW is disabled in dev mode (`d
 
 Custom additions in `tailwind.config.ts`:
 - **Fonts:** `fredoka`, `frank-ruhl-libre` (loaded from Google Fonts)
-- **Colors:** `pastelYellow`, `pastelBlue`, `pastelOrange`, `pastelGreen`, `coral`, `choco`, `off-white`
+- **Colors:** `pastelYellow`, `pastelBlue`, `pastelOrange`, `pastelGreen`, `pastelPlum`, `coral`, `coralDeep`, `choco`, `off-white`
 - **Border radius:** lg = 1.25rem, md = 0.75rem, sm = 0.5rem
 
 Custom color classes are safelisted so Tailwind does not purge them when they are generated dynamically (e.g. from DB values).
@@ -296,6 +308,16 @@ Playwright tests in `e2e/` cover:
 - **category.spec.ts** — Category page behavior
 
 Tests run against a live deployment URL set via `BASE_URL` env var (see `.github/workflows/e2e.yml`). The Playwright config uses Hebrew locale and Jerusalem timezone.
+
+### Cook-Along Feature
+
+The cook-along route (`/recipe/:id/cook?mode=cozy|studio`) renders a fullscreen cooking experience. It re-uses the existing `['recipe', recipeId]` React Query cache — no extra API endpoint needed.
+
+Two modes, both in `src/components/cook-along/`:
+- **Cozy** (`CookAlongCozy`) — one step at a time, swipe/keyboard navigation, saves progress in `localStorage` under key `mika.cozy.<recipeId>`
+- **Studio** (`CookAlongStudio`) — all steps visible, click-to-highlight, ingredient checklist with per-session checked state
+
+Last-used mode persists in `localStorage` under key `mika.cookAlongMode`.
 
 ### Scripts
 

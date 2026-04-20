@@ -39,7 +39,7 @@ const App = () => (
         <PWAReloadPrompt />
         <BrowserRouter>
           <ScrollToTop />
-          <Suspense>
+          <Suspense fallback={null}>
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/category/:categoryName" element={<CategoryPage />} />

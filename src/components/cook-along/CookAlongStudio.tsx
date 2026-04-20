@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { RecipeWithDetails } from '@/types';
 import ModeSelector, { CookAlongMode } from './ModeSelector';
 import { getCategoryThemeVars } from '@/lib/categoryTheme';
@@ -54,36 +54,21 @@ const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose 
   const categoryTheme = getCategoryThemeVars(recipe.categories?.color);
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const isMobile = useIsMobile();
-  const [viewportIdx, setViewportIdx] = useState(0);
+  const [selectedIdx, setSelectedIdx] = useState(0);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [ingredientsOpen, setIngredientsOpen] = useState(false);
-  const stepRefs = useRef<(HTMLElement | null)[]>([]);
 
-  const ingredients = buildIngredients(recipe);
-  const steps = buildSteps(recipe);
-  const activeIdx = !isMobile && hoveredIdx !== null ? hoveredIdx : viewportIdx;
-  const totalSteps = steps.filter(s => s.kind === 'step').length;
-  const activeStepNum = steps.slice(0, activeIdx + 1).filter(s => s.kind === 'step').length;
+  const ingredients = useMemo(() => buildIngredients(recipe), [recipe]);
+  const steps = useMemo(() => buildSteps(recipe), [recipe]);
+  const sections = useMemo(() => Array.from(new Set(ingredients.map(i => i.section))), [ingredients]);
+  // Hover is a transient desktop preview; click/scroll sets the persistent selection
+  const activeIdx = !isMobile && hoveredIdx !== null ? hoveredIdx : selectedIdx;
+  const totalSteps = useMemo(() => steps.filter(s => s.kind === 'step').length, [steps]);
+  const activeStepNum = useMemo(
+    () => steps.slice(0, activeIdx + 1).filter(s => s.kind === 'step').length,
+    [steps, activeIdx]
+  );
   const progress = totalSteps > 0 ? (activeStepNum / totalSteps) * 100 : 0;
-
-  const sections = Array.from(new Set(ingredients.map(i => i.section)));
-
-  useEffect(() => {
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter(e => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]) {
-          const i = Number(visible[0].target.getAttribute('data-step-idx'));
-          if (!isNaN(i)) setViewportIdx(i);
-        }
-      },
-      { threshold: 0.5 }
-    );
-    stepRefs.current.forEach(el => el && obs.observe(el));
-    return () => obs.disconnect();
-  }, [steps.length]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
@@ -147,26 +132,33 @@ const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose 
     >
       {/* Sticky header */}
       <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-sm border-b border-choco/8 shrink-0">
-        <div className="max-w-6xl mx-auto grid h-14 grid-cols-[minmax(5.5rem,1fr)_auto_minmax(5.5rem,1fr)] items-center gap-3 px-5 sm:px-8">
-          <button
-            onClick={onClose}
-            className="flex items-center justify-self-start gap-2 text-choco/70 hover:text-choco no-tap-highlight shrink-0 transition-colors"
-            aria-label="סגור"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
-              <path d="M6 6l12 12M18 6 6 18" />
-            </svg>
-            <span className="text-sm font-fredoka hidden sm:inline">סגור</span>
-          </button>
-          <div className="justify-self-center">
-            <ModeSelector mode={mode} onChange={onModeChange} categoryColor={recipe.categories?.color} />
+        <div className="max-w-6xl mx-auto px-5 sm:px-8 pt-3 pb-2">
+          {/* Controls row */}
+          <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-3">
+            <button
+              onClick={onClose}
+              className="flex items-center justify-self-start gap-2 text-choco/70 hover:text-choco no-tap-highlight shrink-0 transition-colors"
+              aria-label="סגור"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+                <path d="M6 6l12 12M18 6 6 18" />
+              </svg>
+              <span className="text-sm font-fredoka hidden sm:inline">סגור</span>
+            </button>
+            <div className="justify-self-center">
+              <ModeSelector mode={mode} onChange={onModeChange} categoryColor={recipe.categories?.color} />
+            </div>
+            <div className="justify-self-end text-sm text-choco/60 font-fredoka tabular-nums">
+              {activeStepNum}/{totalSteps}
+            </div>
           </div>
-          <div className="min-w-[5.5rem] justify-self-end font-fredoka text-choco truncate text-sm sm:text-base text-left">
-            {recipe.name}
+          {/* Recipe title row */}
+          <div className="text-center mt-1.5">
+            <span className="font-fredoka text-base text-choco/70">{recipe.name}</span>
           </div>
         </div>
         {/* Progress strip */}
-        <div className="h-0.5 bg-choco/5">
+        <div className="h-0.5 bg-choco/5 mt-2">
           <div
             className="h-full bg-[var(--category-accent)] transition-all duration-500"
             style={{ ...categoryTheme, width: `${progress}%` }}
@@ -231,20 +223,18 @@ const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose 
               return (
                 <article
                   key={item.key}
-                  ref={el => { stepRefs.current[i] = el; }}
-                  data-step-idx={i}
+                  onClick={() => setSelectedIdx(i)}
                   onMouseEnter={() => {
                     if (!isMobile) setHoveredIdx(i);
                   }}
                   onMouseLeave={() => {
                     if (!isMobile) setHoveredIdx(null);
                   }}
-                  onFocus={() => setHoveredIdx(i)}
+                  onFocus={() => setSelectedIdx(i)}
                   onBlur={() => setHoveredIdx(null)}
                   tabIndex={0}
                   className={[
-                    'rounded-2xl p-5 sm:p-6 border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--category-accent-border)]',
-                    !isMobile ? 'cursor-pointer' : '',
+                    'rounded-2xl p-5 sm:p-6 border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--category-accent-border)] cursor-pointer',
                     isActive
                       ? 'border-[var(--category-accent-border)] bg-[var(--category-accent-soft)] shadow-sm'
                       : 'border-transparent bg-white/60',
