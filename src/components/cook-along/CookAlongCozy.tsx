@@ -99,7 +99,7 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
 
   return (
     <div
-      className="min-h-screen w-full flex flex-col bg-gradient-mesh animate-scale-in overflow-hidden"
+      className="min-h-screen w-full flex flex-col bg-gradient-mesh animate-scale-in"
       style={{ direction: 'rtl' }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
