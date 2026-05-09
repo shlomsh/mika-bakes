@@ -8,6 +8,12 @@
       "port": 5173
     },
     {
+      "name": "api",
+      "runtimeExecutable": "vercel",
+      "runtimeArgs": ["dev", "-l", "3001"],
+      "port": 3001
+    },
+    {
       "name": "design-preview",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "/tmp/cookbook/project", "-p", "5174", "--no-clipboard"],
