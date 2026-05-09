@@ -27,7 +27,7 @@ npm run dev
 
 Then open http://localhost:5173.
 
-> **Note:** `vercel dev` alone doesn't work for local dev — its SPA rewrite intercepts Vite's internal dev routes. The two-process setup above is the recommended approach. This does not affect production deployment.
+> **Note:** `vercel dev` alone doesn't work for local dev — its SPA rewrite intercepts Vite's internal dev routes. The two-process setup above is the recommended approach. Start order does not matter — `vercel.json` sets a no-op `devCommand` so Vercel Dev no longer spawns its own Vite, and `vite.config.ts` deduplicates React to prevent any future cache-race issues. This does not affect production deployment.
 
 No unit test suite exists. E2E tests use Playwright (`e2e/` directory) and run against a live deployment in CI (`.github/workflows/e2e.yml`).
 

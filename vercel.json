@@ -55,6 +55,7 @@
       ]
     }
   ],
+  "devCommand": "node -e \"require('http').createServer((_,r)=>r.writeHead(200).end()).listen(process.env.PORT||3000)\"",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/((?!api/|src/|@|node_modules/).*)", "destination": "/index.html" }
