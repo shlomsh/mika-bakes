@@ -44,8 +44,10 @@ export default {
     },
     extend: {
       fontFamily: {
-        fredoka: ['Fredoka', 'ui-rounded', 'sans-serif'],
-        frankRuhl: ['Frank Ruhl Libre', 'serif'],
+        display: ['Ktav Yad CLM', 'Fredoka', 'ui-rounded', 'sans-serif'],
+        body: ['Heebo', 'system-ui', 'sans-serif'],
+        fredoka: ['Ktav Yad CLM', 'Fredoka', 'ui-rounded', 'sans-serif'],
+        frankRuhl: ['Heebo', 'system-ui', 'sans-serif'],
       },
       colors: {
         pastelYellow: "#ffd4a8", // apricot peach

@@ -84,7 +84,7 @@ const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose 
           <div key={section}>
             {sections.length > 1 && (
               <div
-                className="font-fredoka text-xs uppercase tracking-widest mb-2 px-1 text-[var(--category-accent)]"
+                className="font-body text-xs uppercase tracking-widest mb-2 px-1 text-[var(--category-accent)]"
                 style={categoryTheme}
               >
                 {section}
@@ -143,18 +143,18 @@ const CookAlongStudio: React.FC<Props> = ({ recipe, mode, onModeChange, onClose 
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
                 <path d="M6 6l12 12M18 6 6 18" />
               </svg>
-              <span className="text-sm font-fredoka hidden sm:inline">סגור</span>
+              <span className="text-sm font-body hidden sm:inline">סגור</span>
             </button>
             <div className="justify-self-center">
               <ModeSelector mode={mode} onChange={onModeChange} categoryColor={recipe.categories?.color} />
             </div>
-            <div className="justify-self-end text-sm text-choco/60 font-fredoka tabular-nums">
+            <div className="justify-self-end text-sm text-choco/60 font-body tabular-nums">
               {activeStepNum}/{totalSteps}
             </div>
           </div>
           {/* Recipe title row */}
           <div className="text-center mt-1.5">
-            <span className="font-fredoka text-base text-choco/70">{recipe.name}</span>
+            <span className="font-body text-base text-choco/70">{recipe.name}</span>
           </div>
         </div>
         {/* Progress strip */}

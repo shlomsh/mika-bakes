@@ -121,14 +121,14 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
           <div className="justify-self-center">
             <ModeSelector mode={mode} onChange={onModeChange} categoryColor={recipe.categories?.color} />
           </div>
-          <div className="min-w-[5.5rem] justify-self-end text-sm text-choco/60 font-fredoka tabular-nums text-left">
+          <div className="min-w-[5.5rem] justify-self-end text-sm text-choco/60 font-body tabular-nums text-left">
             {current.kind !== 'done' && currentStepNum != null
               ? `${currentStepNum}/${totalSteps}`
               : ''}
           </div>
         </div>
         <div className="text-center mt-2">
-          <span className="font-fredoka text-base text-choco/70 truncate">{recipe.name}</span>
+          <span className="font-body text-base text-choco/70 truncate">{recipe.name}</span>
         </div>
       </header>
 
@@ -175,7 +175,7 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
             <>
               <div className="text-center mb-5">
                 <span
-                  className="font-fredoka text-sm uppercase tracking-widest text-[var(--category-accent)]"
+                  className="font-body text-sm uppercase tracking-widest text-[var(--category-accent)]"
                   style={categoryTheme}
                 >
                   שלב {currentStepNum} מתוך {totalSteps}

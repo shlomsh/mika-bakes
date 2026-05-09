@@ -277,7 +277,7 @@ Configured in `vite.config.ts` via `VitePWA`. The SW is disabled in dev mode (`d
 ### Tailwind Custom Theme
 
 Custom additions in `tailwind.config.ts`:
-- **Fonts:** `fredoka`, `frank-ruhl-libre` (loaded from Google Fonts)
+- **Fonts:** `font-display` / `font-fredoka` → Ktav Yad CLM (self-hosted `.woff2` in `public/fonts/`, heading/display); `font-body` / `font-frankRuhl` → Heebo (Google Fonts, body/UI). Old token names kept as aliases for compatibility.
 - **Colors:** `pastelYellow`, `pastelBlue`, `pastelOrange`, `pastelGreen`, `pastelPlum`, `coral`, `coralDeep`, `choco`, `off-white`
 - **Border radius:** lg = 1.25rem, md = 0.75rem, sm = 0.5rem
 

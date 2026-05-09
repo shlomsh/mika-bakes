@@ -52,7 +52,7 @@ const ModeSelector: React.FC<ModeSelectorProps> = ({ mode, onChange, categoryCol
           key={pill.value}
           onClick={() => handleChange(pill.value)}
           className={[
-            'px-3 py-1.5 rounded-full text-sm font-fredoka transition-all whitespace-nowrap',
+            'px-3 py-1.5 rounded-full text-sm font-body transition-all whitespace-nowrap',
             mode === pill.value
               ? 'bg-[var(--category-accent-button)] text-choco shadow-sm shadow-[var(--category-accent-shadow)]'
               : 'text-choco/60 hover:bg-[var(--category-accent-soft)] hover:text-choco',

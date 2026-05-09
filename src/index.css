@@ -2,13 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Add Fredoka and Inter font to base */
+@font-face {
+  font-family: 'Ktav Yad CLM';
+  src: url('/fonts/KtavYadCLM-MediumItalic.woff2') format('woff2');
+  font-display: swap;
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Ktav Yad CLM';
+  src: url('/fonts/KtavYadCLM-BoldItalic.woff2') format('woff2');
+  font-display: swap;
+  font-weight: 700;
+  font-style: normal;
+}
 body {
-  @apply font-frankRuhl bg-off-white rtl:text-right;
+  @apply font-body bg-off-white rtl:text-right;
 }
 h1, h2, h3, .font-fredoka {
-  font-family: 'Fredoka', ui-rounded, sans-serif;
-  letter-spacing: -0.02em;
+  font-family: 'Ktav Yad CLM', 'Fredoka', ui-rounded, sans-serif;
+  letter-spacing: 0.01em;
 }
 
 /* Round all images, for cheerful vibes */
@@ -204,7 +217,7 @@ img {
   height: 2.5rem;
   flex-shrink: 0;
   border-radius: 50%;
-  font-family: 'Fredoka', ui-rounded, sans-serif;
+  font-family: 'Ktav Yad CLM', 'Fredoka', ui-rounded, sans-serif;
   font-size: 1.1rem;
   font-weight: 700;
   color: #614e3e;

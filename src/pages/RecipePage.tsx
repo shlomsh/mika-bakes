@@ -63,13 +63,22 @@ const RecipePage: React.FC = () => {
     return <RecipeNotFound />;
   }
 
-  const handleSaveSuccess = () => {
+  const handleSaveSuccess = async () => {
     setIsEditing(false);
-    queryClient.invalidateQueries({ queryKey: ['recipe', recipeId || null] });
+    // Await SW cache bust before fetching, otherwise the SW may still serve the stale response
+    await bustSwCache(`/api/recipe/${recipeId}`, '/api/recipes/recommended', '/api/categories');
+    // Fetch fresh data bypassing both the SW cache (already busted above) and the Vercel CDN
+    // cache (s-maxage: 3600). `cache: 'no-store'` sends Cache-Control: no-cache to intermediaries.
+    const fresh = await fetch(`/api/recipe/${recipeId}`, { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : null)
+      .catch(() => null);
+    if (fresh) {
+      queryClient.setQueryData(['recipe', recipeId || null], fresh);
+    } else {
+      refetch();
+    }
     queryClient.invalidateQueries({ queryKey: ['recommendedRecipes'] });
     queryClient.invalidateQueries({ queryKey: ['recipes'] });
-    bustSwCache(`/api/recipe/${recipeId}`, '/api/recipes/recommended', '/api/categories');
-    refetch();
   };
 
   // Prepare SEO data
