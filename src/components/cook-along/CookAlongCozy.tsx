@@ -203,7 +203,7 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
               <p className="text-choco/70 mb-8">כל הכבוד — המנה מוכנה!</p>
               <button
                 onClick={(e) => { e.stopPropagation(); onClose(); }}
-                className="bg-coral hover:bg-coralDeep transition-colors text-white font-fredoka text-lg px-8 py-3 rounded-2xl shadow-lg shadow-coral/30"
+                className="bg-coral hover:bg-coralDeep transition-colors text-white font-fredoka leading-none text-lg px-8 py-3 rounded-2xl shadow-lg shadow-coral/30"
               >
                 חזרה למתכון
               </button>

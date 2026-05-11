@@ -90,7 +90,7 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({ recipe, isAuthenticated, is
 
       {recipe.categories && (
         <div
-          className="mb-3 inline-flex w-fit items-center gap-2 rounded-full px-3 py-1 text-sm font-fredoka text-choco ring-1 ring-white/70"
+          className="mb-3 inline-flex w-fit items-center gap-2 rounded-full px-3 py-1 text-sm font-fredoka leading-none text-choco ring-1 ring-white/70"
           style={{
             ...categoryTheme,
             backgroundColor: 'var(--category-accent-surface-strong)',

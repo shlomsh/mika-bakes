@@ -29,10 +29,7 @@ const RecipePicks: React.FC = () => {
 
   return (
     <section dir="rtl" className="animate-fade-up delay-200">
-      <h2 className="font-fredoka text-2xl text-choco mb-5 flex items-center gap-2">
-        <span aria-hidden="true">💛</span>
-        הכי אהובים של מיקה
-      </h2>
+      <h2 className="font-fredoka text-2xl text-choco mb-5">מומלצים</h2>
 
       {/* Featured pick — full-width tall card */}
       <TransitionLink
@@ -61,6 +58,7 @@ const RecipePicks: React.FC = () => {
                 {featured.description}
               </p>
             )}
+            <span className="mt-2 inline-block text-sm text-white/90 font-body">הצג מתכון</span>
           </div>
         </div>
       </TransitionLink>
@@ -87,10 +85,11 @@ const RecipePicks: React.FC = () => {
                     } as React.CSSProperties
                   }
                 />
-                <div className="p-3 flex-1">
+                <div className="p-3 flex-1 flex flex-col gap-1">
                   <p className="font-fredoka text-base text-choco leading-snug group-hover:text-coral group-active:text-coral transition-colors duration-200">
                     {recipe.name}
                   </p>
+                  <span className="text-xs text-choco/50 font-body">הצג מתכון</span>
                 </div>
               </div>
             </TransitionLink>

@@ -17,6 +17,11 @@ export default defineConfig({
     locale: 'he-IL',
     timezoneId: 'Asia/Jerusalem',
     viewport: { width: 1280, height: 800 },
+    ...(process.env.VERCEL_AUTOMATION_BYPASS_SECRET && {
+      extraHTTPHeaders: {
+        'x-vercel-protection-bypass': process.env.VERCEL_AUTOMATION_BYPASS_SECRET,
+      },
+    }),
   },
 
   projects: [
