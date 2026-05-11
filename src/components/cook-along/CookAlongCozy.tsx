@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { RecipeWithDetails } from '@/types';
 import ModeSelector, { CookAlongMode } from './ModeSelector';
 import { getCategoryThemeVars } from '@/lib/categoryTheme';
+import { loadProgress, saveProgress } from '@/lib/cookProgress';
 
 type CozyItem =
   | { kind: 'step'; description: string; step_number: number }
@@ -43,10 +44,8 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
   const dotCount = useMemo(() => items.filter(i => i.kind !== 'done').length, [items]);
 
   const [idx, setIdx] = useState(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      return Math.min(saved.stepIndex ?? 0, items.length - 1);
-    } catch { return 0; }
+    const saved = loadProgress(STORAGE_KEY);
+    return Math.min(saved ?? 0, items.length - 1);
   });
 
   const touchStartX = useRef<number | null>(null);
@@ -54,11 +53,7 @@ const CookAlongCozy: React.FC<Props> = ({ recipe, mode, onModeChange, onClose })
   const isDone = current.kind === 'done';
 
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ stepIndex: idx }));
-    } catch {
-      // Ignore storage access issues and keep the current session usable.
-    }
+    saveProgress(STORAGE_KEY, idx);
   }, [idx, STORAGE_KEY]);
 
   const next = useCallback(() => setIdx(i => Math.min(items.length - 1, i + 1)), [items.length]);
