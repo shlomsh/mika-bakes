@@ -98,7 +98,7 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe, cookAlongPath }) 
               <ModeSelector mode={cookMode} onChange={setCookMode} categoryColor={recipe.categories?.color} />
               <Link
                 to={`${cookAlongPath}?mode=${cookMode}`}
-                className="bg-[var(--category-accent-button)] hover:bg-[var(--category-accent-button-hover)] active:scale-95 transition-all text-choco font-fredoka text-lg px-6 py-2.5 rounded-2xl shadow-md shadow-[var(--category-accent-shadow)] flex items-center gap-2 no-tap-highlight"
+                className="bg-[var(--category-accent-button)] hover:bg-[var(--category-accent-button-hover)] active:scale-95 transition-all text-choco font-fredoka leading-none text-lg px-6 py-2.5 rounded-2xl shadow-md shadow-[var(--category-accent-shadow)] flex items-center gap-2 no-tap-highlight"
                 style={categoryTheme}
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M16 5v14l-11-7z" /></svg>
@@ -216,7 +216,7 @@ const RecipeContent: React.FC<RecipeContentProps> = ({ recipe, cookAlongPath }) 
             </div>
             <Link
               to={`${cookAlongPath}?mode=${cookMode}`}
-              className="bg-[var(--category-accent-button)] hover:bg-[var(--category-accent-button-hover)] transition-colors text-choco font-fredoka px-5 py-2.5 rounded-xl shadow shadow-[var(--category-accent-shadow)] flex items-center gap-2 shrink-0 no-tap-highlight"
+              className="bg-[var(--category-accent-button)] hover:bg-[var(--category-accent-button-hover)] transition-colors text-choco font-fredoka leading-none px-5 py-2.5 rounded-xl shadow shadow-[var(--category-accent-shadow)] flex items-center gap-2 shrink-0 no-tap-highlight"
               style={categoryTheme}
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M16 5v14l-11-7z" /></svg>
