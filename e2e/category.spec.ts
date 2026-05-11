@@ -15,10 +15,10 @@ test.describe('Category page', () => {
 
     await expect(page).toHaveURL(/\/category\//);
 
-    // CategoryPage.tsx:82 — "מתכונים בקטגוריית: {name}"
+    // CategoryPage.tsx — h1 shows the category name (no prefix)
     const h1 = page.getByRole('heading', { level: 1 });
     await expect(h1).toBeVisible();
-    await expect(h1).toContainText('מתכונים בקטגוריית');
+    await expect(h1).not.toContainText('קטגוריה לא נמצאה');
   });
 
   test('category page shows back-to-home link', async ({ page }) => {
@@ -28,8 +28,8 @@ test.describe('Category page', () => {
     await page.locator('a[href^="/category/"]').filter({ visible: true }).first().click();
     await page.waitForLoadState('networkidle');
 
-    // Desktop button is hidden sm:inline-flex — visible at 1280px viewport
-    const backLink = page.getByRole('link', { name: 'חזרה לדף הבית' }).first();
+    // CategoryPage.tsx — Breadcrumb renders <Link label="בית" to="/" />
+    const backLink = page.getByRole('link', { name: 'בית' }).first();
     await expect(backLink).toBeVisible();
   });
 
@@ -45,9 +45,10 @@ test.describe('Category page', () => {
     await page.goto(`/category/${slug}`);
     await page.waitForLoadState('networkidle');
 
+    // CategoryPage.tsx — h1 shows the category name (no prefix)
     const h1 = page.getByRole('heading', { level: 1 });
     await expect(h1).toBeVisible();
     await expect(h1).not.toContainText('קטגוריה לא נמצאה');
-    await expect(h1).toContainText('מתכונים בקטגוריית');
+    await expect(h1).not.toContainText('שגיאה');
   });
 });

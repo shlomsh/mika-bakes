@@ -1,18 +1,17 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Recipe detail page', () => {
-  test('clicking "הצג מתכון" from recommended list opens the recipe page', async ({ page }) => {
+  test('clicking a recipe link from recommended list opens the recipe page', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // RecipePicks.tsx:58 — <Button asChild><Link to="/recipe/:id">הצג מתכון</Link></Button>
-    // renders as <a role="link">
-    const viewRecipeLink = page.getByRole('link', { name: 'הצג מתכון' }).first();
+    // RecipePicks.tsx — TransitionLink wrapping recipe name (no "הצג מתכון" button)
+    const recipeLink = page.locator('a[href^="/recipe/"]').filter({ visible: true }).first();
 
-    const count = await viewRecipeLink.count();
+    const count = await recipeLink.count();
     test.skip(count === 0, 'No recommended recipes in the database');
 
-    await viewRecipeLink.click();
+    await recipeLink.click();
     await page.waitForLoadState('networkidle');
 
     await expect(page).toHaveURL(/\/recipe\//);
@@ -57,11 +56,11 @@ test.describe('Recipe detail page', () => {
     await page.goto(`/category/${targetSlug}`);
     await page.waitForLoadState('networkidle');
 
-    // CategoryPage.tsx:139 — <Link to="/recipe/:id">הצג מתכון</Link>
-    const viewRecipeLink = page.getByRole('link', { name: 'הצג מתכון' }).first();
-    await expect(viewRecipeLink).toBeVisible();
+    // RecipeCard.tsx — TransitionLink wrapping recipe name
+    const recipeLink = page.locator('a[href^="/recipe/"]').filter({ visible: true }).first();
+    await expect(recipeLink).toBeVisible();
 
-    await viewRecipeLink.click();
+    await recipeLink.click();
     await page.waitForLoadState('networkidle');
 
     await expect(page).toHaveURL(/\/recipe\//);
