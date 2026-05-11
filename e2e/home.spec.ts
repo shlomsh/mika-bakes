@@ -17,8 +17,7 @@ test.describe('Home page', () => {
   });
 
   test('header contains site logo link', async ({ page }) => {
-    // AppHeader.tsx — Link has aria-label="דף הבית"; text content is decorative
-    const logo = page.getByRole('link', { name: 'דף הבית' });
+    const logo = page.getByRole('link', { name: 'ספר המתכונים של מיקה' });
     await expect(logo).toBeVisible();
   });
 
@@ -28,8 +27,8 @@ test.describe('Home page', () => {
   });
 
   test('categories section heading is visible', async ({ page }) => {
-    // Index.tsx — <h2>גלו לפי קטגוריה</h2>
-    const heading = page.getByRole('heading', { name: 'גלו לפי קטגוריה' });
+    // Index.tsx renders two <h2>קטגוריות</h2> (mobile + desktop sidebar)
+    const heading = page.getByRole('heading', { name: 'קטגוריות' }).first();
     await expect(heading).toBeVisible();
   });
 
@@ -41,7 +40,6 @@ test.describe('Home page', () => {
   });
 
   test('recommended recipes section heading is visible', async ({ page }) => {
-    // RecipePicks.tsx — <h2>הכי אהובים של מיקה</h2> (with emoji)
-    await expect(page.getByRole('heading', { name: /הכי אהובים של מיקה/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'מומלצים' })).toBeVisible();
   });
 });

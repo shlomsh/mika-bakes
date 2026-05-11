@@ -32,6 +32,7 @@ const RecipeCard: React.FC<RecipeCardProps> = React.memo(({ recipe, index = 0 })
             {recipe.description}
           </p>
         )}
+        <span className="mt-1 text-sm text-coral font-body">הצג מתכון</span>
       </div>
     </div>
   </TransitionLink>

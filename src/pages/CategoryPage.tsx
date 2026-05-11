@@ -106,9 +106,17 @@ const CategoryPage: React.FC = () => {
                 </span>
               )}
               <h1 className="font-fredoka text-4xl text-choco text-right">
-                {formattedCategoryName}
+                מתכונים בקטגוריית: {formattedCategoryName}
               </h1>
             </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Link
+                to="/"
+                className="hidden sm:inline-flex items-center gap-1.5 text-sm font-body text-choco/60 hover:text-choco transition-colors px-3 py-1.5 rounded-xl hover:bg-white/50"
+              >
+                <Home className="h-3.5 w-3.5" />
+                חזרה לדף הבית
+              </Link>
             {isAuthenticated && category && (
               <Button
                 asChild
@@ -121,6 +129,7 @@ const CategoryPage: React.FC = () => {
                 </Link>
               </Button>
             )}
+            </div>
           </div>
         </header>
 

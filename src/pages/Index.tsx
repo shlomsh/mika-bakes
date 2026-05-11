@@ -65,7 +65,7 @@ const Index = () => {
 
           {/* Categories */}
           <section>
-            <h2 className="font-fredoka text-2xl text-choco mb-5">גלו לפי קטגוריה</h2>
+            <h2 className="font-fredoka text-2xl text-choco mb-5">קטגוריות</h2>
             {isLoadingCategories ? (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                 {[0, 1, 2].map((i) => (
