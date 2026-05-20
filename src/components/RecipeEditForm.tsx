@@ -10,6 +10,7 @@ import { useToast } from '@/hooks/use-toast';
 import { recipeEditSchema, RecipeEditFormValues } from '@/schemas/recipeEditSchema';
 import { updateRecipeInDb } from '@/api/recipeApi';
 import { useAuth } from '@/hooks/useAuth';
+import { useImageUpload } from '@/hooks/useImageUpload';
 import BasicInfoSection from './recipe-edit/BasicInfoSection';
 import IngredientsSection from './recipe-edit/IngredientsSection';
 import InstructionsSection from './recipe-edit/InstructionsSection';
@@ -31,16 +32,17 @@ interface RecipeEditFormProps {
 const RecipeEditForm: React.FC<RecipeEditFormProps> = ({ recipe, onCancel, onSaveSuccess }) => {
   const { toast } = useToast();
   const { getToken } = useAuth();
-  const [imagePreview, setImagePreview] = React.useState<string | null>(recipe.image_url);
   const [isRecommended, setIsRecommended] = React.useState(recipe.recommended || false);
   const { categories, isLoadingCategories } = useCategories();
-  
+  const { url: imageUrl, isUploading, error: uploadError, uploadFile } = useImageUpload(recipe.image_url);
+
   const form = useForm<RecipeEditFormValues>({
     resolver: zodResolver(recipeEditSchema),
     defaultValues: {
       name: recipe.name,
       description: recipe.description || '',
       category_id: recipe.category_id || null,
+      image_url: recipe.image_url || null,
       ingredients: recipe.recipe_ingredients.map(i => ({ description: i.description })),
       instructions: recipe.recipe_instructions.map(i => ({ description: i.description })),
       sauce_ingredients: recipe.recipe_sauce_ingredients?.map(s => ({ description: s.description })) || [],
@@ -50,9 +52,13 @@ const RecipeEditForm: React.FC<RecipeEditFormProps> = ({ recipe, onCancel, onSav
     },
   });
 
+  React.useEffect(() => {
+    form.setValue('image_url', imageUrl);
+  }, [imageUrl, form]);
+
   const mutation = useMutation({
     mutationFn: (args: { recipeId: string; values: RecipeEditFormValues & { recommended?: boolean } }) =>
-      updateRecipeInDb({ ...args, getToken, currentImageUrl: recipe.image_url }),
+      updateRecipeInDb({ ...args, getToken }),
     onSuccess: () => {
       toast({ title: "הצלחה!", description: "המתכון עודכן בהצלחה." });
       onSaveSuccess();
@@ -64,16 +70,11 @@ const RecipeEditForm: React.FC<RecipeEditFormProps> = ({ recipe, onCancel, onSav
   });
 
   const onSubmit = (values: RecipeEditFormValues) => {
-    mutation.mutate({ recipeId: recipe.id, values: { ...values, recommended: isRecommended } });
+    mutation.mutate({ recipeId: recipe.id, values: { ...values, image_url: imageUrl, recommended: isRecommended } });
   };
-  
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-    } else {
-      setImagePreview(recipe.image_url); // Fallback to original image if selection is cancelled
-    }
+
+  const handlePickFile = (file: File) => {
+    uploadFile(file);
   };
 
   return (
@@ -85,10 +86,12 @@ const RecipeEditForm: React.FC<RecipeEditFormProps> = ({ recipe, onCancel, onSav
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
               
-              <BasicInfoSection 
+              <BasicInfoSection
                 recipeName={recipe.name}
-                imagePreview={imagePreview}
-                handleImageChange={handleImageChange}
+                imagePreview={imageUrl}
+                isUploading={isUploading}
+                uploadError={uploadError}
+                onPickFile={handlePickFile}
               />
 
               <Card>
@@ -154,7 +157,7 @@ const RecipeEditForm: React.FC<RecipeEditFormProps> = ({ recipe, onCancel, onSav
                   <X className="h-5 w-5 sm:ml-2" />
                   <span className="hidden sm:inline">ביטול</span>
                 </Button>
-                <Button type="submit" disabled={mutation.isPending} aria-label="שמור שינויים">
+                <Button type="submit" disabled={mutation.isPending || isUploading} aria-label="שמור שינויים">
                   {mutation.isPending ? <Loader2 className="h-4 w-4 sm:ml-2 animate-spin" /> : <Save className="h-4 w-4 sm:ml-2" />}
                   <span className="hidden sm:inline">שמור שינויים</span>
                 </Button>

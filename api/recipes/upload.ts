@@ -46,6 +46,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const blob = await put(filename, req, {
       access: 'public',
+      addRandomSuffix: true, // ensures uploads never collide on filename
     });
 
     return res.status(200).json({ url: blob.url });

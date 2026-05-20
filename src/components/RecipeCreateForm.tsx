@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Save, Blend, Sparkles } from 'lucide-react';
+import { Loader2, Save, Blend, Sparkles, Upload, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { useCategories } from '@/hooks/useCategories';
@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { recipeSchema, RecipeFormValues } from '@/schemas/recipeSchema';
 import { createRecipe } from '@/api/recipes';
 import { bustSwCache } from '@/lib/swCacheBust';
+import { useImageUpload } from '@/hooks/useImageUpload';
 import IngredientsFieldArray from './form/IngredientsFieldArray';
 import InstructionsFieldArray from './form/InstructionsFieldArray';
 import IngredientsListFieldArray from './form/IngredientsListFieldArray';
@@ -29,15 +30,17 @@ const RecipeCreateForm: React.FC<RecipeCreateFormProps> = ({ categoryId }) => {
   const navigate = useNavigate();
   const { categories, isLoadingCategories } = useCategories();
   const { getToken } = useAuth();
-  const [imagePreview, setImagePreview] = React.useState<string | null>(null);
   const queryClient = useQueryClient();
-  
+  const { url: imageUrl, isUploading, error: uploadError, uploadFile } = useImageUpload(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   const form = useForm<RecipeFormValues>({
     resolver: zodResolver(recipeSchema),
     defaultValues: {
       name: '',
       description: '',
       category_id: categoryId || null,
+      image_url: null,
       ingredients: [{ description: '' }],
       instructions: [{ description: '' }],
       sauces: [],
@@ -46,10 +49,12 @@ const RecipeCreateForm: React.FC<RecipeCreateFormProps> = ({ categoryId }) => {
     },
   });
 
-  const { onChange: onImageChange, ...restImageRegister } = form.register("image_file");
+  React.useEffect(() => {
+    form.setValue('image_url', imageUrl);
+  }, [imageUrl, form]);
 
   const mutation = useMutation({
-    mutationFn: (values: RecipeFormValues) => createRecipe(values, getToken),
+    mutationFn: (values: RecipeFormValues) => createRecipe({ ...values, image_url: imageUrl }, getToken),
     onSuccess: (recipeId) => {
       toast({ title: "הצלחה!", description: "המתכון נוצר בהצלחה." });
       queryClient.invalidateQueries({ queryKey: ['recipes'] });
@@ -123,37 +128,57 @@ const RecipeCreateForm: React.FC<RecipeCreateFormProps> = ({ categoryId }) => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="image_file"
-                render={() => (
-                  <FormItem>
-                    <FormLabel>תמונת מתכון</FormLabel>
-                    {imagePreview && (
-                      <div className="mt-2">
-                        <img src={imagePreview} alt="תצוגה מקדימה" className="w-full max-w-sm rounded-md object-cover" />
+              <FormItem>
+                <FormLabel>תמונת מתכון</FormLabel>
+                {imageUrl && (
+                  <div className="mt-2 mb-4 relative">
+                    <img
+                      src={imageUrl}
+                      alt="תצוגה מקדימה"
+                      className="w-full max-w-sm rounded-md object-cover"
+                    />
+                    {isUploading && (
+                      <div className="absolute inset-0 bg-black/40 rounded-md flex items-center justify-center">
+                        <Loader2 className="h-8 w-8 text-white animate-spin" />
                       </div>
                     )}
-                    <FormControl>
-                      <Input 
-                        type="file" 
-                        accept="image/*"
-                        {...restImageRegister}
-                        onChange={(event) => {
-                          onImageChange(event);
-                          const file = event.target.files?.[0];
-                          if (file) {
-                            setImagePreview(URL.createObjectURL(file));
-                          } else {
-                            setImagePreview(null);
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  </div>
                 )}
-              />
+                <div className="space-y-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="w-full sm:w-auto"
+                  >
+                    {isUploading ? (
+                      <Loader2 className="ml-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <Upload className="ml-2 h-4 w-4" />
+                    )}
+                    {isUploading ? 'מעלה...' : imageUrl ? 'שנה תמונה' : 'העלה תמונה'}
+                  </Button>
+                  <p className="text-sm text-choco/60 flex items-center gap-1">
+                    <ImageIcon className="h-3 w-3" />
+                    קבצי תמונה בלבד (JPG, PNG, WebP)
+                  </p>
+                  {uploadError && (
+                    <p className="text-sm text-destructive">{uploadError}</p>
+                  )}
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) uploadFile(file);
+                    event.target.value = '';
+                  }}
+                />
+              </FormItem>
             </CardContent>
           </Card>
 
@@ -189,7 +214,7 @@ const RecipeCreateForm: React.FC<RecipeCreateFormProps> = ({ categoryId }) => {
 
           <div className="flex justify-end gap-4">
             <Button type="button" variant="ghost" onClick={() => navigate(-1)}>ביטול</Button>
-            <Button type="submit" disabled={mutation.isPending}>
+            <Button type="submit" disabled={mutation.isPending || isUploading}>
               {mutation.isPending ? <Loader2 className="ml-2 h-4 w-4 animate-spin" /> : <Save className="ml-2 h-4 w-4" />}
               צור מתכון
             </Button>
