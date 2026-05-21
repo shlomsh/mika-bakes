@@ -36,6 +36,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).send(xml);
   } catch (err: unknown) {
     console.error('GET /sitemap.xml error:', err);
-    return res.status(500).end();
+    return res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
   }
 }
