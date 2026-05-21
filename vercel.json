@@ -63,7 +63,7 @@
   ],
   "devCommand": "node -e \"require('http').createServer((_,r)=>r.writeHead(200).end()).listen(process.env.PORT||3000)\"",
   "rewrites": [
-    { "source": "/sitemap.xml", "destination": "/api/sitemap.xml" },
+    { "source": "/sitemap.xml", "destination": "/api/sitemap" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/((?!api/|src/|@|node_modules/).*)", "destination": "/index.html" }
   ]
