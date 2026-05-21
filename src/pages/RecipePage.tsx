@@ -86,6 +86,32 @@ const RecipePage: React.FC = () => {
   const recipeDescription = recipe.description || `מתכון ל${recipe.name} מהאוסף של מיקה`;
   const recipeImage = recipe.image_url || '/uploads/ba509ec5-29e1-4ea7-9d37-63b4c65f5cef.png';
   const recipeUrl = `/recipe/${recipeId}`;
+  const fullImageUrl = recipeImage.startsWith('http')
+    ? recipeImage
+    : `https://mika-bakes.vercel.app${recipeImage}`;
+
+  const recipeJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Recipe',
+    name: recipe.name,
+    description: recipeDescription,
+    image: fullImageUrl,
+    author: { '@type': 'Person', name: 'מיקה' },
+    inLanguage: 'he',
+    datePublished: recipe.created_at?.slice(0, 10),
+    dateModified: recipe.updated_at?.slice(0, 10),
+    url: `https://mika-bakes.vercel.app/recipe/${recipeId}`,
+    ...(recipe.recipe_ingredients?.length > 0 && {
+      recipeIngredient: recipe.recipe_ingredients.map(i => i.description),
+    }),
+    ...(recipe.recipe_instructions?.length > 0 && {
+      recipeInstructions: recipe.recipe_instructions.map((s, idx) => ({
+        '@type': 'HowToStep',
+        position: idx + 1,
+        text: s.description,
+      })),
+    }),
+  };
 
   if (isEditing) {
     return (
@@ -110,6 +136,7 @@ const RecipePage: React.FC = () => {
         image={recipeImage}
         url={recipeUrl}
         type="article"
+        jsonLd={recipeJsonLd}
       />
       <RecipeDisplay
         recipe={recipe}

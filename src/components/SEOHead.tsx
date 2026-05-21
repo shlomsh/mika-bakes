@@ -8,6 +8,7 @@ interface SEOHeadProps {
   image?: string;
   url?: string;
   type?: 'website' | 'article';
+  jsonLd?: object;
 }
 
 const SEOHead: React.FC<SEOHeadProps> = ({
@@ -15,7 +16,8 @@ const SEOHead: React.FC<SEOHeadProps> = ({
   description = "האפליקציה הביתית של מיקה לכל מתכוני קינוחים, מאפים ובישולים!",
   image = "/uploads/ba509ec5-29e1-4ea7-9d37-63b4c65f5cef.png",
   url,
-  type = "website"
+  type = "website",
+  jsonLd,
 }) => {
   // Ensure we have a full URL for the image
   const getFullImageUrl = (imageUrl: string) => {
@@ -52,6 +54,12 @@ const SEOHead: React.FC<SEOHeadProps> = ({
       {/* Additional meta tags for better SEO */}
       <meta name="author" content="מיקה" />
       <link rel="canonical" href={fullUrl} />
+
+      {jsonLd && (
+        <script type="application/ld+json">
+          {JSON.stringify(jsonLd)}
+        </script>
+      )}
     </Helmet>
   );
 };

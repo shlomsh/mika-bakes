@@ -53,10 +53,17 @@
       "headers": [
         { "key": "Cache-Control", "value": "public, s-maxage=60, stale-while-revalidate=300" }
       ]
+    },
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, s-maxage=3600, stale-while-revalidate=86400" }
+      ]
     }
   ],
   "devCommand": "node -e \"require('http').createServer((_,r)=>r.writeHead(200).end()).listen(process.env.PORT||3000)\"",
   "rewrites": [
+    { "source": "/sitemap.xml", "destination": "/api/sitemap.xml" },
     { "source": "/api/(.*)", "destination": "/api/$1" },
     { "source": "/((?!api/|src/|@|node_modules/).*)", "destination": "/index.html" }
   ]
