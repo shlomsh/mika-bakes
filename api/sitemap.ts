@@ -17,8 +17,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const urls: string[] = [];
 
-    const tag = (loc: string, lastmod?: string, priority = '0.8') =>
-      `  <url>\n    <loc>${loc}</loc>${lastmod ? `\n    <lastmod>${lastmod.slice(0, 10)}</lastmod>` : ''}\n    <priority>${priority}</priority>\n  </url>`;
+    const tag = (loc: string, lastmod?: string | Date, priority = '0.8') =>
+      `  <url>\n    <loc>${loc}</loc>${lastmod ? `\n    <lastmod>${new Date(lastmod).toISOString().slice(0, 10)}</lastmod>` : ''}\n    <priority>${priority}</priority>\n  </url>`;
 
     urls.push(tag(`${BASE_URL}/`, undefined, '1.0'));
 
