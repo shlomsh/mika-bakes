@@ -78,7 +78,7 @@ export default defineConfig({
         ],
 
         navigateFallback: "index.html",
-        navigateFallbackDenylist: [/^\/api\//],
+        navigateFallbackDenylist: [/^\/api\//, /^\/sitemap\.xml$/],
       },
 
       manifest: {
