@@ -2,12 +2,13 @@
 import React from 'react';
 import RecipeCreateForm from '@/components/RecipeCreateForm';
 import AppHeader from '@/components/AppHeader';
+import NoAdminAccess from '@/components/NoAdminAccess';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChefHat } from 'lucide-react';
 
 const NewRecipePage: React.FC = () => {
-    const { isAuthenticated, loading } = useAuth();
+    const { isAuthenticated, isAdmin, loading } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const categoryId = searchParams.get('categoryId');
@@ -32,6 +33,10 @@ const NewRecipePage: React.FC = () => {
 
     if (!isAuthenticated) {
         return null;
+    }
+
+    if (!isAdmin) {
+        return <NoAdminAccess />;
     }
 
     return (

@@ -10,6 +10,7 @@ npm run build      # Production build (output: dist/)
 npm run build:dev  # Development-mode build (source maps, no minification)
 npm run lint       # ESLint
 npm run preview    # Preview production build locally
+npm run test:api   # Node unit tests for api/_auth.ts (requireAuth / requireAdmin, Clerk mocked)
 npm run test:e2e   # Playwright E2E tests (requires running app or BASE_URL)
 ```
 
@@ -29,7 +30,7 @@ Then open http://localhost:5173.
 
 > **Note:** `vercel dev` alone doesn't work for local dev — its SPA rewrite intercepts Vite's internal dev routes. The two-process setup above is the recommended approach. Start order does not matter — `vercel.json` sets a no-op `devCommand` so Vercel Dev no longer spawns its own Vite, and `vite.config.ts` deduplicates React to prevent any future cache-race issues. This does not affect production deployment.
 
-No unit test suite exists. E2E tests use Playwright (`e2e/` directory) and run against a live deployment in CI (`.github/workflows/e2e.yml`).
+The only unit tests are `tests/*.test.ts` (`npm run test:api`, Node's built-in runner). E2E tests use Playwright (`e2e/` directory) and run against a live deployment in CI (`.github/workflows/e2e.yml`).
 
 ---
 
@@ -74,7 +75,7 @@ All page components are **lazy-loaded** via `React.lazy` + `Suspense`:
 ```
 api/
   _db.ts                   # getDb() — Neon tagged-template SQL helper (singleton)
-  _auth.ts                 # requireAuth(header) — Clerk JWT verification
+  _auth.ts                 # requireAuth(header) — Clerk JWT verification; requireAdmin(header) — + publicMetadata.role === 'admin'
   categories.ts            # GET /api/categories
   categories/[id].ts       # PUT /api/categories/:id
   recipes/
@@ -87,9 +88,9 @@ api/
 ```
 
 - Public routes (no auth): all GETs
-- Authenticated routes (require `Authorization: Bearer <clerk_token>`): all mutations (POST, PUT, DELETE)
+- Admin-only routes (require `Authorization: Bearer <clerk_token>` of a user whose Clerk `publicMetadata.role === "admin"`): all mutations (POST, PUT, DELETE). They call `requireAdmin()`, which returns 401 (no/invalid token), 403 (signed in, not admin) or 503 (Clerk lookup failed).
 - `api/_db.ts` uses `neon()` tagged-template from `@neondatabase/serverless`
-- `api/_auth.ts` uses `createClerkClient` from `@clerk/backend`
+- `api/_auth.ts` uses `verifyToken` and `createClerkClient` from `@clerk/backend`; `requireAdmin` fetches the user by id on each call (no session-token claim needed, role removal is immediate)
 - Recipe create (`POST /api/recipes`) and update (`PUT /api/recipe/:id`) are wrapped in transactions (BEGIN/COMMIT/ROLLBACK). Update uses delete-then-reinsert for all related tables.
 
 ### Frontend API Client
@@ -139,7 +140,7 @@ Mutations call `queryClient.invalidateQueries()` on success **and** call `bustSw
 
 ### Authentication
 
-`useAuth()` hook (`src/hooks/useAuth.ts`) wraps Clerk's `useAuth` + `useUser`, returning `{ session, user, loading, isAuthenticated, getToken }`. `Auth.tsx` uses `<SignedIn>`, `<SignedOut>`, `<SignInButton mode="modal">`, `<SignOutButton>` from `@clerk/clerk-react`. `NewRecipePage` redirects unauthenticated users away.
+`useAuth()` hook (`src/hooks/useAuth.ts`) wraps Clerk's `useAuth` + `useUser`, returning `{ session, user, loading, isAuthenticated, isAdmin, getToken }`. Admin UI (edit/delete/add controls) is gated on `isAdmin`, not `isAuthenticated`; `NoAdminAccess.tsx` is the screen signed-in non-admins see on admin-only pages. Admins are tagged in the Clerk dashboard (user → Metadata → Public: `{"role":"admin"}`); the instance is Invite-only. `Auth.tsx` uses `<SignedIn>`, `<SignedOut>`, `<SignInButton mode="modal">`, `<SignOutButton>` from `@clerk/clerk-react`. `NewRecipePage` redirects unauthenticated users away and shows `NoAdminAccess` to signed-in non-admins.
 
 ---
 

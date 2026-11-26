@@ -23,7 +23,7 @@ const fetchRecipeById = async (recipeId: string): Promise<RecipeWithDetails | nu
 const RecipePage: React.FC = () => {
   const { recipeId } = useParams<{ recipeId: string }>();
   const [isEditing, setIsEditing] = useState(false);
-  const { isAuthenticated, getToken } = useAuth();
+  const { isAdmin, getToken } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -113,7 +113,7 @@ const RecipePage: React.FC = () => {
     }),
   };
 
-  if (isEditing) {
+  if (isEditing && isAdmin) {
     return (
       <>
         <SEOHead
@@ -140,7 +140,7 @@ const RecipePage: React.FC = () => {
       />
       <RecipeDisplay
         recipe={recipe}
-        isAuthenticated={isAuthenticated}
+        isAdmin={isAdmin}
         isDeletePending={deleteMutation.isPending}
         onEdit={() => setIsEditing(true)}
         onDelete={() => recipeId && deleteMutation.mutate(recipeId)}
