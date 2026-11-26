@@ -8,8 +8,11 @@ on:
 jobs:
   e2e:
     name: Playwright sanity checks
-    # Only run when Vercel signals the deployment succeeded
-    if: github.event.deployment_status.state == 'success'
+    # Only run when Vercel signals a production deployment succeeded.
+    # Preview deployments have no database (Neon is connected to Production only).
+    if: >-
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment.environment == 'Production'
     # Pinned: Playwright cannot install Chromium on ubuntu-latest (26.04) yet
     runs-on: ubuntu-24.04
     timeout-minutes: 15
