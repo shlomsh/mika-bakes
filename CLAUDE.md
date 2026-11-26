@@ -10,7 +10,7 @@ npm run build      # Production build (output: dist/)
 npm run build:dev  # Development-mode build (source maps, no minification)
 npm run lint       # ESLint
 npm run preview    # Preview production build locally
-npm run test:api   # Node unit tests for api/_auth.ts (requireAuth / requireAdmin, Clerk mocked)
+npm run test:api   # Node unit tests: api/_auth.ts (Clerk mocked) + recipe save atomicity (in-memory PGlite)
 npm run test:e2e   # Playwright E2E tests (requires running app or BASE_URL)
 ```
 
@@ -75,6 +75,7 @@ All page components are **lazy-loaded** via `React.lazy` + `Suspense`:
 ```
 api/
   _db.ts                   # getDb() — Neon tagged-template SQL helper (singleton)
+  _recipeChildren.ts       # childInserts() — builds the 6 child-table INSERTs for a recipe save
   _auth.ts                 # requireAuth(header) — Clerk JWT verification; requireAdmin(header) — + publicMetadata.role === 'admin'
   categories.ts            # GET /api/categories
   categories/[id].ts       # PUT /api/categories/:id
@@ -91,7 +92,8 @@ api/
 - Admin-only routes (require `Authorization: Bearer <clerk_token>` of a user whose Clerk `publicMetadata.role === "admin"`): all mutations (POST, PUT, DELETE). They call `requireAdmin()`, which returns 401 (no/invalid token), 403 (signed in, not admin) or 503 (Clerk lookup failed).
 - `api/_db.ts` uses `neon()` tagged-template from `@neondatabase/serverless`
 - `api/_auth.ts` uses `verifyToken` and `createClerkClient` from `@clerk/backend`; `requireAdmin` fetches the user by id on each call (no session-token claim needed, role removal is immediate)
-- Recipe create (`POST /api/recipes`) and update (`PUT /api/recipe/:id`) are wrapped in transactions (BEGIN/COMMIT/ROLLBACK). Update uses delete-then-reinsert for all related tables.
+- Recipe create (`POST /api/recipes`) and update (`PUT /api/recipe/:id`) each run as one `sql.transaction([...])` (non-interactive, one HTTP request, all-or-nothing). Create generates the recipe UUID in code so child inserts can reference it. Update checks the recipe exists (404), then update + delete-then-reinsert of all related tables in the same transaction.
+- **Never use sql`BEGIN` / sql`COMMIT` with the Neon HTTP driver:** every standalone sql`` call is its own request and its own transaction, so they do nothing. Use `sql.transaction([...])`.
 
 ### Frontend API Client
 

@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getDb } from '../_db.js';
 import { requireAdmin } from '../_auth.js';
+import { childInserts } from '../_recipeChildren.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { id } = req.query;
@@ -75,98 +76,39 @@ async function handlePut(id: string, req: VercelRequest, res: VercelResponse) {
 
   try {
     const sql = getDb();
-    const {
-      name, description, image_url, category_id, recommended,
-      ingredients, instructions, sauces, sauce_ingredients,
-      garnish_ingredients, garnish_instructions,
-    } = req.body;
+    const { name, description, image_url, category_id, recommended } = req.body;
 
-    await sql`BEGIN`;
+    // Checked first so a missing recipe is a 404, not a foreign-key error from the inserts.
+    const existing = await sql`SELECT 1 FROM recipes WHERE id = ${id}`;
+    if (existing.length === 0) {
+      return res.status(404).json({ error: 'Recipe not found' });
+    }
 
-    try {
-      // Update core recipe
-      const rows = await sql`
+    // One non-interactive transaction (one HTTP request): if any insert fails,
+    // the update and the deletes roll back too, so the old recipe stays intact.
+    const [rows] = await sql.transaction([
+      sql`
         UPDATE recipes
         SET name = ${name}, description = ${description ?? null},
             image_url = ${image_url ?? null}, category_id = ${category_id ?? null},
             recommended = ${recommended ?? false}, updated_at = now()
         WHERE id = ${id}
         RETURNING *
-      `;
-
-      if (rows.length === 0) {
-        await sql`ROLLBACK`;
-        return res.status(404).json({ error: 'Recipe not found' });
-      }
-
+      `,
       // Delete-reinsert pattern for all 6 related tables
-      await sql`DELETE FROM recipe_ingredients WHERE recipe_id = ${id}`;
-      await sql`DELETE FROM recipe_instructions WHERE recipe_id = ${id}`;
-      await sql`DELETE FROM recipe_sauces WHERE recipe_id = ${id}`;
-      await sql`DELETE FROM recipe_sauce_ingredients WHERE recipe_id = ${id}`;
-      await sql`DELETE FROM recipe_garnish_ingredients WHERE recipe_id = ${id}`;
-      await sql`DELETE FROM recipe_garnish_instructions WHERE recipe_id = ${id}`;
+      sql`DELETE FROM recipe_ingredients WHERE recipe_id = ${id}`,
+      sql`DELETE FROM recipe_instructions WHERE recipe_id = ${id}`,
+      sql`DELETE FROM recipe_sauces WHERE recipe_id = ${id}`,
+      sql`DELETE FROM recipe_sauce_ingredients WHERE recipe_id = ${id}`,
+      sql`DELETE FROM recipe_garnish_ingredients WHERE recipe_id = ${id}`,
+      sql`DELETE FROM recipe_garnish_instructions WHERE recipe_id = ${id}`,
+      ...childInserts(sql, id, req.body),
+    ]);
 
-      if (ingredients?.length) {
-        for (let i = 0; i < ingredients.length; i++) {
-          await sql`
-            INSERT INTO recipe_ingredients (recipe_id, description, sort_order)
-            VALUES (${id}, ${ingredients[i].description}, ${ingredients[i].sort_order ?? i})
-          `;
-        }
-      }
-
-      if (instructions?.length) {
-        for (let i = 0; i < instructions.length; i++) {
-          await sql`
-            INSERT INTO recipe_instructions (recipe_id, description, step_number)
-            VALUES (${id}, ${instructions[i].description}, ${instructions[i].step_number ?? i + 1})
-          `;
-        }
-      }
-
-      if (sauces?.length) {
-        for (let i = 0; i < sauces.length; i++) {
-          await sql`
-            INSERT INTO recipe_sauces (recipe_id, description, step_number)
-            VALUES (${id}, ${sauces[i].description}, ${sauces[i].step_number ?? i + 1})
-          `;
-        }
-      }
-
-      if (sauce_ingredients?.length) {
-        for (let i = 0; i < sauce_ingredients.length; i++) {
-          await sql`
-            INSERT INTO recipe_sauce_ingredients (recipe_id, description, sort_order)
-            VALUES (${id}, ${sauce_ingredients[i].description}, ${sauce_ingredients[i].sort_order ?? i})
-          `;
-        }
-      }
-
-      if (garnish_ingredients?.length) {
-        for (let i = 0; i < garnish_ingredients.length; i++) {
-          await sql`
-            INSERT INTO recipe_garnish_ingredients (recipe_id, description, sort_order)
-            VALUES (${id}, ${garnish_ingredients[i].description}, ${garnish_ingredients[i].sort_order ?? i})
-          `;
-        }
-      }
-
-      if (garnish_instructions?.length) {
-        for (let i = 0; i < garnish_instructions.length; i++) {
-          await sql`
-            INSERT INTO recipe_garnish_instructions (recipe_id, description, step_number)
-            VALUES (${id}, ${garnish_instructions[i].description}, ${garnish_instructions[i].step_number ?? i + 1})
-          `;
-        }
-      }
-
-      await sql`COMMIT`;
-      return res.status(200).json(rows[0]);
-    } catch (innerErr) {
-      await sql`ROLLBACK`;
-      throw innerErr;
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Recipe not found' });
     }
+    return res.status(200).json(rows[0]);
   } catch (err: unknown) {
     console.error('PUT /api/recipe/[id] error:', err);
     return res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
