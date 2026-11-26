@@ -23,7 +23,7 @@ const fetchCategoryAndRecipes = async (categorySlug: string | undefined): Promis
 
 const CategoryPage: React.FC = () => {
   const { categoryName } = useParams<{ categoryName: string }>();
-  const { isAuthenticated } = useAuth();
+  const { isAdmin } = useAuth();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['category', categoryName],
@@ -117,7 +117,7 @@ const CategoryPage: React.FC = () => {
                 <Home className="h-3.5 w-3.5" />
                 חזרה לדף הבית
               </Link>
-            {isAuthenticated && category && (
+            {isAdmin && category && (
               <Button
                 asChild
                 className="shrink-0 border-0 bg-[var(--category-accent-button)] text-choco shadow-sm shadow-[var(--category-accent-shadow)] hover:bg-[var(--category-accent-button-hover)]"

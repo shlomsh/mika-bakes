@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { put } from '@vercel/blob';
-import { requireAuth } from '../_auth.js';
+import { requireAdmin } from '../_auth.js';
 
 export const config = {
   api: {
@@ -17,7 +17,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    await requireAuth(req.headers.authorization ?? null);
+    await requireAdmin(req.headers.authorization ?? null);
   } catch (err: unknown) {
     const status = (err as { status?: number }).status || 401;
     return res.status(status).json({ error: err instanceof Error ? err.message : String(err) });

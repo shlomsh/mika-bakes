@@ -1,13 +1,26 @@
 import React from 'react';
 import { SignedIn, SignedOut, SignInButton, SignOutButton } from '@clerk/clerk-react';
 import { Button } from './ui/button';
-import { LogOut, User } from 'lucide-react';
+import { Lock, LogOut, User } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const AuthComponent = () => {
+  const { isAdmin, loading } = useAuth();
+
   return (
     <>
       <SignedIn>
         <div className="flex items-center gap-2">
+          {!loading && !isAdmin && (
+            <span
+              role="status"
+              title="החשבון הזה מחובר, אבל אין לו הרשאה להוסיף או לערוך מתכונים"
+              className="inline-flex items-center gap-1.5 rounded-full bg-pastelYellow/60 px-3 py-1 text-xs font-body text-choco"
+            >
+              <Lock className="h-3 w-3" aria-hidden="true" />
+              ללא הרשאת ניהול
+            </span>
+          )}
           <SignOutButton>
             <Button variant="ghost" size="icon" className="sm:w-auto sm:px-4">
               <LogOut />

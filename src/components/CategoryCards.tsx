@@ -19,7 +19,7 @@ interface CategoryCardsProps {
 }
 
 const CategoryCards: React.FC<CategoryCardsProps> = ({ categories, onEdit }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAdmin } = useAuth();
 
   return (
     <div
@@ -50,7 +50,7 @@ const CategoryCards: React.FC<CategoryCardsProps> = ({ categories, onEdit }) => 
             </div>
           </TransitionLink>
 
-          {isAuthenticated && (
+          {isAdmin && (
             <div className="absolute top-2 left-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
               <DropdownMenu dir="rtl">
                 <DropdownMenuTrigger asChild>

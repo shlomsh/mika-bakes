@@ -20,13 +20,13 @@ import { getCategoryThemeVars } from '@/lib/categoryTheme';
 
 interface RecipeHeaderProps {
   recipe: RecipeWithDetails;
-  isAuthenticated: boolean;
+  isAdmin: boolean;
   isDeletePending: boolean;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-const RecipeHeader: React.FC<RecipeHeaderProps> = ({ recipe, isAuthenticated, isDeletePending, onEdit, onDelete }) => {
+const RecipeHeader: React.FC<RecipeHeaderProps> = ({ recipe, isAdmin, isDeletePending, onEdit, onDelete }) => {
   const categoryTheme = getCategoryThemeVars(recipe.categories?.color);
   const headerActionClassName =
     "rounded-full border-0 shadow-sm shadow-choco/10 font-fredoka transition-all duration-200 hover:-translate-y-0.5";
@@ -40,7 +40,7 @@ const RecipeHeader: React.FC<RecipeHeaderProps> = ({ recipe, isAuthenticated, is
           { label: recipe.name },
         ]} />
 
-        {isAuthenticated && (
+        {isAdmin && (
           <div className="flex items-center gap-2 shrink-0">
             <Button
               variant="outline"

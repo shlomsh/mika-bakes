@@ -7,7 +7,7 @@ import { RecipeWithDetails } from './types';
 
 interface RecipeDisplayProps {
   recipe: RecipeWithDetails;
-  isAuthenticated: boolean;
+  isAdmin: boolean;
   isDeletePending: boolean;
   onEdit: () => void;
   onDelete: () => void;

@@ -9,6 +9,7 @@
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
+    "test:api": "node --experimental-test-module-mocks --test 'tests/*.test.ts'",
     "test:e2e": "playwright test"
   },
   "dependencies": {

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getDb } from '../_db.js';
-import { requireAuth } from '../_auth.js';
+import { requireAdmin } from '../_auth.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { id } = req.query;
@@ -67,7 +67,7 @@ async function handleGet(id: string, res: VercelResponse) {
 
 async function handlePut(id: string, req: VercelRequest, res: VercelResponse) {
   try {
-    await requireAuth(req.headers.authorization ?? null);
+    await requireAdmin(req.headers.authorization ?? null);
   } catch (err: unknown) {
     const status = (err as { status?: number }).status || 401;
     return res.status(status).json({ error: err instanceof Error ? err.message : String(err) });
@@ -175,7 +175,7 @@ async function handlePut(id: string, req: VercelRequest, res: VercelResponse) {
 
 async function handleDelete(id: string, req: VercelRequest, res: VercelResponse) {
   try {
-    await requireAuth(req.headers.authorization ?? null);
+    await requireAdmin(req.headers.authorization ?? null);
   } catch (err: unknown) {
     const status = (err as { status?: number }).status || 401;
     return res.status(status).json({ error: err instanceof Error ? err.message : String(err) });
